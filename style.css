@@ -1,95 +1,178 @@
 body{
+
 margin:0;
 font-family:'Press Start 2P', cursive;
 color:white;
-background:linear-gradient(-45deg,#0f0f0f,#151515,#1a1a1a,#101010);
+
+background:linear-gradient(-45deg,#0f0f0f,#1a1a1a,#121212,#0a0a0a);
 background-size:400% 400%;
-animation:bg 15s ease infinite;
+
+animation:bg 16s ease infinite;
+
 }
 
 @keyframes bg{
+
 0%{background-position:0% 50%;}
 50%{background-position:100% 50%;}
 100%{background-position:0% 50%;}
+
 }
 
-/* HEADER */
 
 header{
+
 text-align:center;
 padding:40px 0;
+
 }
 
 .logo{
+
 width:220px;
-margin:auto;
 display:block;
+margin:auto;
+
 }
 
-nav ul{
-list-style:none;
-padding:0;
-margin-top:30px;
-}
+nav{
 
-nav li{
-display:inline-block;
-margin:0 25px;
+margin-top:25px;
+
 }
 
 nav a{
+
+margin:0 25px;
 text-decoration:none;
 color:white;
 font-size:14px;
+
 }
 
 nav a:hover{
+
 color:#7cffb3;
+
 }
 
-/* HOME SECTION */
 
 .home{
+
 display:flex;
 justify-content:space-between;
 align-items:center;
+
 max-width:1100px;
 margin:auto;
+
 padding:120px 40px;
+
 }
 
 .server-info{
+
 text-align:left;
+
 }
 
 .ip{
+
 font-size:20px;
 color:#7cffb3;
 cursor:pointer;
-}
 
-.ip:hover{
-color:#a5ffd0;
 }
 
 .copy{
+
 font-size:10px;
-color:#888;
+color:#aaa;
+
 }
 
-.discord-area{
+.discord{
+
 text-align:right;
+
 }
 
-.discord-button{
+.discord-btn{
+
 background:#5865F2;
-padding:16px 28px;
+
+padding:18px 30px;
+
+border-radius:8px;
+
 color:white;
 text-decoration:none;
-border-radius:8px;
-font-size:12px;
+
 }
 
-.discord-button:hover{
+.discord-btn:hover{
+
 background:#4752c4;
+
+}
+
+
+.page{
+
+max-width:900px;
+margin:auto;
+
+text-align:center;
+
+padding:120px 40px;
+
+}
+
+
+.vote-btn{
+
+display:block;
+
+margin:25px auto;
+
+background:#7cffb3;
+
+color:black;
+
+padding:15px;
+
+width:220px;
+
+text-decoration:none;
+
+border-radius:6px;
+
+}
+
+
+.patreon-btn{
+
+background:#ff424d;
+
+padding:18px 30px;
+
+border-radius:8px;
+
+color:white;
+
+text-decoration:none;
+
+}
+
+
+.rules{
+
+text-align:left;
+
+max-width:500px;
+
+margin:auto;
+
+line-height:2;
+
 }
