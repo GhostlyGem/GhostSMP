@@ -1,7 +1,7 @@
 const ipElement = document.getElementById("ip")
 
 ipElement.addEventListener("click", () => {
-navigator.clipboard.writeText("ghostsurvival.net")
+navigator.clipboard.writeText("mc.ghostsurvival.net")
 alert("Server IP copied!")
 })
 
