@@ -1,0 +1,80 @@
+body{
+margin:0;
+background:#0b0b0b;
+color:white;
+font-family:Arial, sans-serif;
+}
+
+/* HEADER */
+
+header{
+text-align:center;
+padding:40px 0;
+}
+
+.logo{
+width:220px;
+display:block;
+margin:auto;
+}
+
+nav ul{
+list-style:none;
+padding:0;
+margin-top:25px;
+}
+
+nav li{
+display:inline-block;
+margin:0 25px;
+}
+
+nav a{
+text-decoration:none;
+color:white;
+font-size:18px;
+transition:0.2s;
+}
+
+nav a:hover{
+color:#7cffb3;
+}
+
+/* HOME SECTION */
+
+.home{
+display:flex;
+justify-content:space-between;
+align-items:center;
+max-width:1100px;
+margin:auto;
+padding:120px 40px;
+}
+
+.server-info{
+text-align:left;
+}
+
+.ip{
+font-size:28px;
+font-weight:bold;
+color:#7cffb3;
+}
+
+.discord-area{
+text-align:right;
+}
+
+.discord-button{
+background:#5865F2;
+padding:16px 28px;
+color:white;
+text-decoration:none;
+border-radius:8px;
+font-size:18px;
+transition:0.2s;
+}
+
+.discord-button:hover{
+background:#4752c4;
+}
