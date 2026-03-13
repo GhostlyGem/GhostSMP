@@ -49,3 +49,30 @@ linkedAt: Date.now()
 document.getElementById("result").innerText = "Minecraft account linked!";
 
 });
+
+import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const generateButton = document.getElementById("generate-code")
+
+generateButton.addEventListener("click", async () => {
+
+const user = auth.currentUser
+
+if(!user){
+alert("Login first")
+return
+}
+
+const code = Math.floor(100000 + Math.random() * 900000)
+
+await setDoc(doc(db,"verifications",code.toString()),{
+
+uid:user.uid,
+created:Date.now()
+
+})
+
+document.getElementById("code-display").innerText =
+"Run this command in Minecraft: /verify "+code
+
+})
