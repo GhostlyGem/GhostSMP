@@ -1,15 +1,19 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
 
-apiKey: "YOUR_KEY",
-authDomain: "YOUR_DOMAIN",
-projectId: "YOUR_PROJECT_ID",
-storageBucket: "YOUR_BUCKET",
-messagingSenderId: "YOUR_ID",
-appId: "YOUR_APP_ID"
+apiKey: "AIzaSyC9bCU2pRu0VGi0chBDdupYPSo5FxPSimo",
+authDomain: "ghostsmp-bf0a3.firebaseapp.com",
+projectId: "ghostsmp-bf0a3",
+storageBucket: "ghostsmp-bf0a3.firebasestorage.app",
+messagingSenderId: "415275850062",
+appId: "1:415275850062:web:c64aa3147dec2212a7661f"
 
 };
 
