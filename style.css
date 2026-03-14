@@ -254,6 +254,14 @@ width:100%;
     cursor: pointer;
 }
 
+.nav-right span{
+
+margin-right:15px;
+font-size:14px;
+color:#7cffb3;
+
+}
+
 .login-btn {
     background: transparent;
     color: white;
