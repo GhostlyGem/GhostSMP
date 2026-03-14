@@ -68,3 +68,23 @@ timestamp:Date.now()
 }
 
 });
+
+
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const db = getFirestore();
+
+onAuthStateChanged(auth, async (user)=>{
+
+if(user){
+
+await setDoc(doc(db,"users",user.uid),{
+
+name:user.displayName,
+role:"player"
+
+},{merge:true});
+
+}
+
+});
