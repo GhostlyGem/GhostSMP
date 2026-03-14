@@ -280,3 +280,42 @@ color:black;
 background:#00cc7a;
 
 }
+
+
+.sidebar{
+
+position:fixed;
+right:20px;
+top:200px;
+
+width:220px;
+
+background:rgba(20,20,20,0.8);
+padding:20px;
+
+border-radius:10px;
+
+}
+
+.sidebar h3{
+
+font-size:12px;
+margin-bottom:15px;
+
+}
+
+.player{
+
+display:flex;
+align-items:center;
+margin-bottom:10px;
+
+}
+
+.player img{
+
+width:28px;
+height:28px;
+margin-right:10px;
+
+}
