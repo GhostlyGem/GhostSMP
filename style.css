@@ -176,3 +176,56 @@ margin:auto;
 line-height:2;
 
 }
+
+header {
+    text-align: center;
+    padding-top: 20px;
+}
+
+.logo {
+    width: 220px;
+    margin-bottom: 15px;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1e1e1e;
+    padding: 15px 40px;
+}
+
+.nav-left a {
+    color: white;
+    text-decoration: none;
+    margin-right: 25px;
+    font-size: 18px;
+}
+
+.nav-left a:hover {
+    color: #00ff9d;
+}
+
+.nav-right button {
+    margin-left: 10px;
+    padding: 8px 18px;
+    border-radius: 6px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.login-btn {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+}
+
+.signup-btn {
+    background: #00ff9d;
+    color: black;
+}
+
+.signup-btn:hover {
+    background: #00cc7a;
+}
