@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
 
@@ -22,19 +22,30 @@ const signupBtn = document.getElementById("signup-btn");
 
 function login() {
 
-signInWithPopup(auth, provider)
-.then((result) => {
-
-alert("Logged in as " + result.user.displayName);
-
-})
-.catch((error) => {
-
-console.error(error);
-
-});
+signInWithPopup(auth, provider);
 
 }
 
 if(loginBtn) loginBtn.onclick = login;
 if(signupBtn) signupBtn.onclick = login;
+
+const authArea = document.getElementById("auth-area");
+
+onAuthStateChanged(auth, (user) => {
+
+if(user){
+
+authArea.innerHTML = `
+<span style="margin-right:10px;">👤 ${user.displayName}</span>
+<button id="logout-btn" class="login-btn">Logout</button>
+`;
+
+document.getElementById("logout-btn").onclick = () => {
+
+signOut(auth);
+
+};
+
+}
+
+});
