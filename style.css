@@ -247,10 +247,14 @@ header {
 }
 
 .signup-btn {
-    background: #00ff9d;
-    color: black;
+
+background:#00ff9d;
+color:black;
+
 }
 
-.signup-btn:hover {
-    background: #00cc7a;
+.signup-btn:hover{
+
+background:#00cc7a;
+
 }
