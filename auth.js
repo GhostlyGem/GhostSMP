@@ -49,3 +49,22 @@ signOut(auth);
 }
 
 });
+
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const db = getFirestore();
+
+onAuthStateChanged(auth, async (user)=>{
+
+if(user){
+
+await setDoc(doc(db,"websiteOnline",user.uid),{
+
+name:user.displayName,
+timestamp:Date.now()
+
+});
+
+}
+
+});
