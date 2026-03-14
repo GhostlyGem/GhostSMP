@@ -1,42 +1,36 @@
-const ip = document.getElementById("ip")
+const ip = document.getElementById("ip");
 
-if(ip){
-
-ip.addEventListener("click", ()=>{
-
-navigator.clipboard.writeText("ghostsurvival.net")
-
-alert("Server IP copied!")
-
-})
-
+if (ip) {
+  ip.addEventListener("click", () => {
+    navigator.clipboard.writeText("ghostsurvival.net");
+    alert("Server IP copied!");
+  });
 }
-
-
 
 fetch("https://api.mcsrvstat.us/2/ghostsurvival.net")
+.then(res => res.json())
+.then(data => {
 
-.then(res=>res.json())
+  const status = document.getElementById("status");
+  const players = document.getElementById("players");
 
-.then(data=>{
+  if (!status || !players) return;
 
-const status = document.getElementById("status")
-const players = document.getElementById("players")
+  if (data.online) {
 
-if(!status) return
+    status.innerHTML = "Status: 🟢 Online";
 
-if(data.online){
+    players.innerHTML =
+      "Players: " + data.players.online + " / " + data.players.max;
 
-status.innerHTML="Status: 🟢 Online"
+  } else {
 
-players.innerHTML="Players: "+data.players.online+" / "+data.players.max
+    status.innerHTML = "Status: 🔴 Offline";
+    players.innerHTML = "Players: 0";
 
-}
-
-else{
-
-status.innerHTML="Status: 🔴 Offline"
-
-}
+  }
 
 })
+.catch(err => {
+  console.error(err);
+});
