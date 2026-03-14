@@ -187,12 +187,19 @@ header {
     margin-bottom: 15px;
 }
 
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #1e1e1e;
-    padding: 15px 40px;
+.navbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 40px;
+
+    background:rgba(20,20,20,0.75);
+    backdrop-filter:blur(10px);
+
+    border-radius:12px;
+    margin:0 40px;
+
+    box-shadow:0 0 20px rgba(0,0,0,0.5);
 }
 
 .nav-left a {
