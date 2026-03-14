@@ -8,7 +8,7 @@ authDomain: "ghostsmp-bf0a3.firebaseapp.com",
 projectId: "ghostsmp-bf0a3",
 storageBucket: "ghostsmp-bf0a3.firebasestorage.app",
 messagingSenderId: "415275850062",
-appId: "PASTE_APP_ID"
+appId: "1:415275850062:web:c64aa3147dec2212a7661f"
 1:415275850062:web:c64aa3147dec2212a7661f
 };
 
