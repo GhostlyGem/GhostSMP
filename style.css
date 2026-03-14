@@ -212,6 +212,24 @@ header {
 .nav-left a:hover {
     color: #00ff9d;
 }
+.nav-left a{
+    position:relative;
+}
+
+.nav-left a::after{
+    content:"";
+    position:absolute;
+    width:0%;
+    height:2px;
+    background:#00ff9d;
+    bottom:-5px;
+    left:0;
+    transition:0.3s;
+}
+
+.nav-left a:hover::after{
+    width:100%;
+}
 
 .nav-right button {
     margin-left: 10px;
