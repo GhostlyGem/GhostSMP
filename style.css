@@ -218,22 +218,31 @@ box-shadow:0 0 20px rgba(0,0,0,0.6);
     color: #00ff9d;
 }
 .nav-left a{
-    position:relative;
+
+position:relative;
+
 }
 
 .nav-left a::after{
-    content:"";
-    position:absolute;
-    width:0%;
-    height:2px;
-    background:#00ff9d;
-    bottom:-5px;
-    left:0;
-    transition:0.3s;
+
+content:"";
+position:absolute;
+width:0%;
+height:2px;
+
+background:#7cffb3;
+
+bottom:-6px;
+left:0;
+
+transition:0.3s;
+
 }
 
 .nav-left a:hover::after{
-    width:100%;
+
+width:100%;
+
 }
 
 .nav-right button {
