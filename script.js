@@ -2,12 +2,12 @@ const ip = document.getElementById("ip");
 
 if (ip) {
   ip.addEventListener("click", () => {
-    navigator.clipboard.writeText("ghostsurvival.net");
+    navigator.clipboard.writeText("mc.ghostsurvival.net");
     alert("Server IP copied!");
   });
 }
 
-fetch("https://api.mcsrvstat.us/2/ghostsurvival.net")
+fetch("https://api.mcsrvstat.us/2/mc.ghostsurvival.net")
 .then(res => res.json())
 .then(data => {
 
