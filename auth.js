@@ -3,26 +3,24 @@ import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstati
 
 const firebaseConfig = {
 
-apiKey: "AIzaSyC9bCU2pRu0VGi0chBDdupYPSo5FxPSimo",
+apiKey: "YOUR_API_KEY",
 authDomain: "ghostsmp-bf0a3.firebaseapp.com",
 projectId: "ghostsmp-bf0a3",
 storageBucket: "ghostsmp-bf0a3.firebasestorage.app",
 messagingSenderId: "415275850062",
 appId: "1:415275850062:web:c64aa3147dec2212a7661f"
-1:415275850062:web:c64aa3147dec2212a7661f
+
 };
 
 const app = initializeApp(firebaseConfig);
-
-const auth = getAuth();
+const auth = getAuth(app);
 
 const provider = new GoogleAuthProvider();
 
-const loginButton = document.getElementById("google-login");
+const loginBtn = document.getElementById("login-btn");
+const signupBtn = document.getElementById("signup-btn");
 
-if(loginButton){
-
-loginButton.addEventListener("click", () => {
+function login() {
 
 signInWithPopup(auth, provider)
 .then((result) => {
@@ -36,9 +34,7 @@ console.error(error);
 
 });
 
-});
-
 }
 
-loginBtn.onclick = login;
-signupBtn.onclick = login;
+if(loginBtn) loginBtn.onclick = login;
+if(signupBtn) signupBtn.onclick = login;
