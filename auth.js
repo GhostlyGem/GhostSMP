@@ -39,3 +39,6 @@ console.error(error);
 });
 
 }
+
+loginBtn.onclick = login;
+signupBtn.onclick = login;
