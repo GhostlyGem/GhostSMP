@@ -62,9 +62,13 @@ authArea.innerHTML = `
 <button id="logout-btn" class="login-btn">Logout</button>
 `;
 
-document.getElementById("logout-btn").onclick = ()=>{
+const logoutBtn = document.getElementById("logout-btn");
+
+if(logoutBtn){
+logoutBtn.addEventListener("click", ()=>{
 signOut(auth);
-};
+});
+}
 }
 
 }
