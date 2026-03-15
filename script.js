@@ -119,10 +119,8 @@ showApprovalPopup();
 if(data.status === "denied"){
 showDeniedPopup();
 }
-}
 
 });
-
 });
 
 });
