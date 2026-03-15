@@ -71,9 +71,10 @@ function showLoggedInUI(user){
   const logoutBtn = document.getElementById("logout-btn");
 
   if(logoutBtn){
-    logoutBtn.addEventListener("click", ()=>{
-      signOut(auth);
-    });
+    logoutBtn.addEventListener("click", async ()=>{
+  await deleteDoc(doc(db,"websiteOnline",user.uid));
+  signOut(auth);
+});
   }
 
 }
