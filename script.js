@@ -125,3 +125,28 @@ showApprovalPopup();
 }
 
 watchApplicationStatus();
+
+
+function showApprovalPopup(){
+
+const popup = document.createElement("div");
+
+popup.innerText = "🎉 Your staff application was approved!";
+
+popup.style.position = "fixed";
+popup.style.top = "20px";
+popup.style.right = "20px";
+popup.style.background = "#2ecc71";
+popup.style.color = "white";
+popup.style.padding = "15px 20px";
+popup.style.borderRadius = "8px";
+popup.style.fontWeight = "bold";
+popup.style.zIndex = "9999";
+
+document.body.appendChild(popup);
+
+setTimeout(()=>{
+popup.remove();
+},10000);
+
+}
