@@ -59,8 +59,11 @@ function showLoggedInUI(user){
 
   if(!authArea) return;
 
+  const headURL = `https://crafatar.com/avatars/${user.uid}?size=32&overlay`;
+
   authArea.innerHTML = `
-    <span style="margin-right:10px;">👤 ${user.displayName}</span>
+    <img src="${headURL}" style="width:28px;height:28px;border-radius:4px;margin-right:8px;">
+    <span style="margin-right:10px;">${user.displayName}</span>
     <button id="logout-btn" class="login-btn">Logout</button>
   `;
 
