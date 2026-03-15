@@ -81,6 +81,10 @@ function showLoggedInUI(user){
 
 onAuthStateChanged(auth, async (user)=>{
 
+window.addEventListener("beforeunload", async () => {
+  await deleteDoc(doc(db,"websiteOnline",user.uid));
+});
+  
   if(user){
 
     try{
