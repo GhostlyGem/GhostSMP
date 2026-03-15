@@ -72,19 +72,15 @@ function showLoggedInUI(user){
 
   if(logoutBtn){
     logoutBtn.addEventListener("click", async ()=>{
-  await deleteDoc(doc(db,"websiteOnline",user.uid));
-  signOut(auth);
-});
+      await deleteDoc(doc(db,"websiteOnline",user.uid));
+      signOut(auth);
+    });
   }
 
 }
 
 onAuthStateChanged(auth, async (user)=>{
 
-window.addEventListener("beforeunload", async () => {
-  await deleteDoc(doc(db,"websiteOnline",user.uid));
-});
-  
   if(user){
 
     try{
@@ -99,6 +95,11 @@ window.addEventListener("beforeunload", async () => {
         role:"player",
         lastLogin:Date.now()
       },{merge:true});
+
+      // Remove user if they close the tab
+      window.addEventListener("beforeunload", ()=>{
+        deleteDoc(doc(db,"websiteOnline",user.uid));
+      });
 
     }catch(err){
       console.error("Firestore error:", err);
