@@ -88,3 +88,40 @@ if(playersContainer){
   });
 
 }
+
+
+import { query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const auth = getAuth();
+
+function watchApplicationStatus(){
+
+onAuthStateChanged(auth,(user)=>{
+
+if(!user) return;
+
+const q = query(
+collection(db,"applications"),
+where("user","==",user.uid)
+);
+
+onSnapshot(q,(snapshot)=>{
+
+snapshot.forEach((doc)=>{
+
+const data = doc.data();
+
+if(data.status === "approved"){
+showApprovalPopup();
+}
+
+});
+
+});
+
+});
+
+}
+
+watchApplicationStatus();
