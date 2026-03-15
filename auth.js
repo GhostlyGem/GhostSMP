@@ -64,7 +64,7 @@ function showLoggedInUI(user){
 
   authArea.innerHTML = `
 <img src="${headURL}" class="user-avatar">
-<span class="user-name">${user.displayName}</span>
+<a href="account.html" class="user-name">${user.displayName}</a>
 <button id="logout-btn" class="login-btn">Logout</button>
 `;
 
