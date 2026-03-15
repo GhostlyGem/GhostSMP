@@ -1,20 +1,15 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-import {
-  getFirestore,
-  collection,
-  onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 /* ---------------- Firebase Setup ---------------- */
 
 const firebaseConfig = {
-apiKey: "AIzaSyC9bCU2pRu0VGi0chBDdupYPSo5FxPSimo",
-authDomain: "ghostsmp-bf0a3.firebaseapp.com",
-projectId: "ghostsmp-bf0a3",
-storageBucket: "ghostsmp-bf0a3.firebasestorage.app",
-messagingSenderId: "415275850062",
-appId: "1:415275850062:web:c64aa3147dec2212a7661f"
+  apiKey: "AIzaSyC9bCU2pRu0VGi0chBDdupYPSo5FxPSimo",
+  authDomain: "ghostsmp-bf0a3.firebaseapp.com",
+  projectId: "ghostsmp-bf0a3",
+  storageBucket: "ghostsmp-bf0a3.firebasestorage.app",
+  messagingSenderId: "415275850062",
+  appId: "1:415275850062:web:c64aa3147dec2212a7661f"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -45,9 +40,7 @@ fetch("https://api.mcsrvstat.us/2/mc.ghostsurvival.net")
   if (data.online) {
 
     status.innerHTML = "Status: 🟢 Online";
-
-    players.innerHTML =
-      "Players: " + data.players.online + " / " + data.players.max;
+    players.innerHTML = "Players: " + data.players.online + " / " + data.players.max;
 
   } else {
 
@@ -57,40 +50,41 @@ fetch("https://api.mcsrvstat.us/2/mc.ghostsurvival.net")
   }
 
 })
-.catch(err => {
-  console.error(err);
-});
+.catch(err => console.error(err));
 
 /* ---------------- Players On Website ---------------- */
 
 const playersContainer = document.getElementById("website-players");
 
-function loadWebsitePlayers(){
+if(playersContainer){
 
-if(!playersContainer) return;
+  const websitePlayersRef = collection(db,"websiteOnline");
 
-onSnapshot(collection(db,"websiteOnline"), (snapshot)=>{
+  onSnapshot(websitePlayersRef, (snapshot)=>{
 
-playersContainer.innerHTML = "";
+    playersContainer.innerHTML = "";
 
-snapshot.forEach((doc)=>{
+    if(snapshot.empty){
+      playersContainer.innerHTML = "<p>No players online</p>";
+      return;
+    }
 
-const data = doc.data();
+    snapshot.forEach((doc)=>{
 
-const player = document.createElement("div");
-player.className = "player";
+      const data = doc.data();
 
-player.innerHTML = `
-<img src="https://crafatar.com/avatars/${doc.id}?size=32&overlay">
-<span>${data.name}</span>
-`;
+      const playerDiv = document.createElement("div");
+      playerDiv.className = "player";
 
-playersContainer.appendChild(player);
+      playerDiv.innerHTML = `
+        <img src="https://crafatar.com/avatars/${doc.id}?size=32&overlay">
+        <span>${data.name}</span>
+      `;
 
-});
+      playersContainer.appendChild(playerDiv);
 
-});
+    });
+
+  });
 
 }
-
-loadWebsitePlayers();
