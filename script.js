@@ -1,3 +1,27 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* ---------------- Firebase Setup ---------------- */
+
+const firebaseConfig = {
+apiKey: "AIzaSyC9bCU2pRu0VGi0chBDdupYPSo5FxPSimo",
+authDomain: "ghostsmp-bf0a3.firebaseapp.com",
+projectId: "ghostsmp-bf0a3",
+storageBucket: "ghostsmp-bf0a3.firebasestorage.app",
+messagingSenderId: "415275850062",
+appId: "1:415275850062:web:c64aa3147dec2212a7661f"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* ---------------- Copy Server IP ---------------- */
+
 const ip = document.getElementById("ip");
 
 if (ip) {
@@ -6,6 +30,8 @@ if (ip) {
     alert("Server IP copied!");
   });
 }
+
+/* ---------------- Minecraft Server Status ---------------- */
 
 fetch("https://api.mcsrvstat.us/2/mc.ghostsurvival.net")
 .then(res => res.json())
@@ -34,3 +60,37 @@ fetch("https://api.mcsrvstat.us/2/mc.ghostsurvival.net")
 .catch(err => {
   console.error(err);
 });
+
+/* ---------------- Players On Website ---------------- */
+
+const playersContainer = document.getElementById("website-players");
+
+function loadWebsitePlayers(){
+
+if(!playersContainer) return;
+
+onSnapshot(collection(db,"websiteOnline"), (snapshot)=>{
+
+playersContainer.innerHTML = "";
+
+snapshot.forEach((doc)=>{
+
+const data = doc.data();
+
+const player = document.createElement("div");
+player.className = "player";
+
+player.innerHTML = `
+<img src="https://crafatar.com/avatars/${doc.id}?size=32&overlay">
+<span>${data.name}</span>
+`;
+
+playersContainer.appendChild(player);
+
+});
+
+});
+
+}
+
+loadWebsitePlayers();
