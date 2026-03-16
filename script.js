@@ -111,6 +111,50 @@ playersCount.innerText="Players on Website ("+count+")";
 
 }
 
+const staffList = document.getElementById("staff-list");
+
+if(staffList){
+
+const staffRoles = [
+"Owner",
+"Head Admin",
+"Admin",
+"Manager",
+"Mod",
+"JrMod",
+"Event Manager"
+];
+
+const usersRef = collection(db,"users");
+
+onSnapshot(usersRef,(snapshot)=>{
+
+staffList.innerHTML="";
+
+snapshot.forEach((doc)=>{
+
+const data = doc.data();
+
+if(!staffRoles.includes(data.role)) return;
+
+const div = document.createElement("div");
+
+div.className="staff-card";
+
+div.innerHTML = `
+<img src="https://mc-heads.net/avatar/${data.name}/64">
+<p>${data.name}</p>
+<span>${data.role}</span>
+`;
+
+staffList.appendChild(div);
+
+});
+
+});
+
+}
+
 /* ---------------- Watch Application Status ---------------- */
 
 function watchApplicationStatus(){
