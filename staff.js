@@ -98,6 +98,7 @@ dashboard.style.display="block";
 
 loadApplications(role);
 loadStaff(role);
+loadLogs();
 
 });
 
@@ -150,6 +151,8 @@ await updateDoc(doc(db,"applications",appDoc.id),{
 status:"approved"
 });
 
+await logAction(`${auth.currentUser.displayName} approved ${data.name}'s application`);
+
 };
 
 /* Deny */
@@ -159,6 +162,8 @@ denyBtn.onclick = async ()=>{
 await updateDoc(doc(db,"applications",appDoc.id),{
 status:"denied"
 });
+
+await logAction(`${auth.currentUser.displayName} denied ${data.name}'s application`);
 
 };
 
@@ -213,8 +218,18 @@ Role: ${data.role}
 `;
 
 const promoteBtn = div.querySelector(".promote");
-const demoteBtn = div.querySelector(".demote");
+await updateDoc(doc(db,"users",uid),{
+role:newRole
+});
 
+await logAction(`${auth.currentUser.displayName} promoted ${data.name} → ${newRole}`);
+const demoteBtn = div.querySelector(".demote");
+await updateDoc(doc(db,"users",uid),{
+role:newRole
+});
+
+await logAction(`${auth.currentUser.displayName} demoted ${data.name} → ${newRole}`);
+  
 /* ---------------- Safety Locks ---------------- */
 
 /* Nobody can modify the Owner */
@@ -299,5 +314,46 @@ staffList.appendChild(div);
 });
 
 });
+
+function loadLogs(){
+
+const logsDiv = document.getElementById("staff-logs");
+
+const logsRef = collection(db,"staffLogs");
+
+onSnapshot(logsRef,(snapshot)=>{
+
+logsDiv.innerHTML="";
+
+const logs = [];
+
+snapshot.forEach((doc)=>{
+logs.push(doc.data());
+});
+
+/* newest first */
+
+logs.sort((a,b)=> b.timestamp - a.timestamp);
+
+logs.slice(0,20).forEach((log)=>{
+
+const div = document.createElement("div");
+div.className="application";
+
+const date = new Date(log.timestamp).toLocaleString();
+
+div.innerHTML = `
+${log.action}
+<br>
+<span style="opacity:.6;font-size:12px">${date}</span>
+`;
+
+logsDiv.appendChild(div);
+
+});
+
+});
+
+}
 
 }
