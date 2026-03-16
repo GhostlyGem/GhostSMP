@@ -5,8 +5,16 @@ getFirestore,
 collection,
 onSnapshot,
 doc,
-updateDoc
+updateDoc,
+getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+import {
+getAuth,
+onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+/* Firebase */
 
 const firebaseConfig = {
 apiKey: "AIzaSyC9bCU2pRu0VGi0chBDdupYPSo5FxPSimo",
@@ -19,8 +27,54 @@ appId: "1:415275850062:web:c64aa3147dec2212a7661f"
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth();
+
+/* Page Elements */
 
 const applicationsDiv = document.getElementById("applications");
+const loadingText = document.getElementById("loading");
+
+/* Auth Check */
+
+onAuthStateChanged(auth, async (user)=>{
+
+if(!user){
+window.location.href="/";
+return;
+}
+
+/* Check Role */
+
+const userDoc = await getDoc(doc(db,"users",user.uid));
+
+if(!userDoc.exists()){
+window.location.href="/";
+return;
+}
+
+const role = userDoc.data().role;
+
+/* Only allow Owner or Staff */
+
+if(role !== "Owner" && role !== "Staff"){
+
+window.location.href="/";
+return;
+
+}
+
+/* Access granted */
+
+loadingText.style.display="none";
+applicationsDiv.style.display="block";
+
+loadApplications();
+
+});
+
+/* Load Applications */
+
+function loadApplications(){
 
 const appsRef = collection(db,"applications");
 
@@ -67,3 +121,5 @@ applicationsDiv.appendChild(div);
 });
 
 });
+
+}
