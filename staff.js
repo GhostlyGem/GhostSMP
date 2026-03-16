@@ -14,7 +14,7 @@ getAuth,
 onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-/* Firebase */
+/* ---------------- Firebase Setup ---------------- */
 
 const firebaseConfig = {
 apiKey: "AIzaSyC9bCU2pRu0VGi0chBDdupYPSo5FxPSimo",
@@ -29,12 +29,30 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
 
-/* Page Elements */
+/* ---------------- Page Elements ---------------- */
 
 const applicationsDiv = document.getElementById("applications");
 const loadingText = document.getElementById("loading");
+const pendingCounter = document.getElementById("pending-count");
 
-/* Auth Check */
+/* ---------------- Rank Structure ---------------- */
+
+const allowedRoles = [
+"Owner",
+"Head Admin",
+"Admin",
+"Manager",
+"Mod",
+"JrMod",
+"Event Manager"
+];
+
+const approvalRoles = [
+"Owner",
+"Head Admin"
+];
+
+/* ---------------- Auth Check ---------------- */
 
 onAuthStateChanged(auth, async (user)=>{
 
@@ -43,7 +61,7 @@ window.location.href="/";
 return;
 }
 
-/* Check Role */
+/* Get User Role */
 
 const userDoc = await getDoc(doc(db,"users",user.uid));
 
@@ -54,27 +72,27 @@ return;
 
 const role = userDoc.data().role;
 
-/* Only allow Owner or Staff */
+/* Check if user can access panel */
 
-if(role !== "Owner" && role !== "Staff"){
-
+if(!allowedRoles.includes(role)){
 window.location.href="/";
 return;
-
 }
 
-/* Access granted */
+/* Access Granted */
 
-loadingText.style.display="none";
-applicationsDiv.style.display="block";
+if(loadingText) loadingText.style.display="none";
+if(applicationsDiv) applicationsDiv.style.display="block";
 
-loadApplications();
+/* Load applications */
+
+loadApplications(role);
 
 });
 
-/* Load Applications */
+/* ---------------- Load Applications ---------------- */
 
-function loadApplications(){
+function loadApplications(role){
 
 const appsRef = collection(db,"applications");
 
@@ -82,25 +100,52 @@ onSnapshot(appsRef,(snapshot)=>{
 
 applicationsDiv.innerHTML="";
 
+let pending = 0;
+
 snapshot.forEach((appDoc)=>{
 
 const data = appDoc.data();
 
+if(data.status === "pending"){
+pending++;
+}
+
 const div = document.createElement("div");
-div.className="application";
+div.className = "application";
+
+/* Application Card */
 
 div.innerHTML = `
-<b>${data.name}</b><br>
-Status: ${data.status}<br><br>
+<h3>${data.name}</h3>
+
+<p><b>Status:</b> ${data.status}</p>
+
+<p><b>Applying For:</b> ${data.position || "Staff"}</p>
+
+<p><b>Why should we choose you?</b></p>
+<p>${data.reason || "No response provided."}</p>
 
 <button class="approve">Approve</button>
 <button class="deny">Deny</button>
 `;
 
+/* Buttons */
+
 const approveBtn = div.querySelector(".approve");
 const denyBtn = div.querySelector(".deny");
 
+/* Disable buttons if not Owner or Head Admin */
+
+if(!approvalRoles.includes(role)){
+approveBtn.disabled = true;
+denyBtn.disabled = true;
+}
+
+/* Approve */
+
 approveBtn.onclick = async ()=>{
+
+if(!approvalRoles.includes(role)) return;
 
 await updateDoc(doc(db,"applications",appDoc.id),{
 status:"approved"
@@ -108,7 +153,11 @@ status:"approved"
 
 };
 
+/* Deny */
+
 denyBtn.onclick = async ()=>{
+
+if(!approvalRoles.includes(role)) return;
 
 await updateDoc(doc(db,"applications",appDoc.id),{
 status:"denied"
@@ -119,6 +168,12 @@ status:"denied"
 applicationsDiv.appendChild(div);
 
 });
+
+/* Update Pending Counter */
+
+if(pendingCounter){
+pendingCounter.innerText = "Pending Applications ("+pending+")";
+}
 
 });
 
