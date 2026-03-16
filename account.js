@@ -58,3 +58,33 @@ alert("Name updated!");
 };
 
 });
+
+const db = getFirestore();
+const auth = getAuth();
+
+const saveBtn = document.getElementById("save-mc");
+
+if(saveBtn){
+
+saveBtn.onclick = async ()=>{
+
+const user = auth.currentUser;
+
+if(!user) return;
+
+const mcName = document.getElementById("mc-username").value.trim();
+
+if(mcName.length < 3){
+alert("Invalid Minecraft username");
+return;
+}
+
+await updateDoc(doc(db,"users",user.uid),{
+mcUsername: mcName
+});
+
+alert("Minecraft username saved!");
+
+};
+
+}
