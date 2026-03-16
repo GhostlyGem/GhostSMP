@@ -28,6 +28,23 @@ alert("Server IP copied!");
 });
 }
 
+/*------------------ Shared Popup styling -------------------*/
+
+function stylePopup(popup){
+
+popup.style.position="fixed";
+popup.style.top="20px";
+popup.style.right="20px";
+popup.style.background="#222";
+popup.style.color="white";
+popup.style.padding="20px";
+popup.style.borderRadius="8px";
+popup.style.fontWeight="bold";
+popup.style.zIndex="9999";
+popup.style.textAlign="center";
+
+}
+
 /* ---------------- Minecraft Server Status ---------------- */
 
 async function loadServerStatus(){
@@ -78,7 +95,6 @@ loadServerStatus();
 
 /* ---------------- Players On Website ---------------- */
 
-const playersCount = document.getElementById("website-players-count");
 
 if(playersCount){
 
@@ -113,12 +129,12 @@ snapshot.forEach((doc)=>{
 
 const data = doc.data();
 
-if(data.status==="approved"){
-showApprovalPopup();
+if(data.status==="approved" && !data.acknowledged){
+showApprovalPopup(doc.id);
 }
 
-if(data.status==="denied"){
-showDeniedPopup();
+if(data.status==="denied" && !data.acknowledged){
+showDeniedPopup(doc.id);
 }
 
 });
@@ -133,46 +149,54 @@ watchApplicationStatus();
 
 /* ---------------- Popups ---------------- */
 
-function showApprovalPopup(){
+function showApprovalPopup(appId){
 
 const popup=document.createElement("div");
 
-popup.innerText="🎉 Your staff application was approved!";
+popup.innerHTML=`
+🎉 Your staff application was approved!
+<br><br>
+<button id="popup-ok">OK</button>
+`;
 
-popup.style.position="fixed";
-popup.style.top="20px";
-popup.style.right="20px";
-popup.style.background="#2ecc71";
-popup.style.color="white";
-popup.style.padding="15px 20px";
-popup.style.borderRadius="8px";
-popup.style.fontWeight="bold";
-popup.style.zIndex="9999";
+stylePopup(popup);
 
 document.body.appendChild(popup);
 
-setTimeout(()=>popup.remove(),10000);
+document.getElementById("popup-ok").onclick = async ()=>{
+
+await updateDoc(doc(db,"applications",appId),{
+acknowledged:true
+});
+
+popup.remove();
+
+};
 
 }
 
-function showDeniedPopup(){
+function showDeniedPopup(appId){
 
 const popup=document.createElement("div");
 
-popup.innerText="❌ Your staff application was denied.";
+popup.innerHTML=`
+❌ Your staff application was denied.
+<br><br>
+<button id="popup-ok">OK</button>
+`;
 
-popup.style.position="fixed";
-popup.style.top="20px";
-popup.style.right="20px";
-popup.style.background="#e74c3c";
-popup.style.color="white";
-popup.style.padding="15px 20px";
-popup.style.borderRadius="8px";
-popup.style.fontWeight="bold";
-popup.style.zIndex="9999";
+stylePopup(popup);
 
 document.body.appendChild(popup);
 
-setTimeout(()=>popup.remove(),10000);
+document.getElementById("popup-ok").onclick = async ()=>{
+
+await updateDoc(doc(db,"applications",appId),{
+acknowledged:true
+});
+
+popup.remove();
+
+};
 
 }
