@@ -142,7 +142,9 @@ const div = document.createElement("div");
 div.className="staff-card";
 
 div.innerHTML = `
-<img src="https://mc-heads.net/avatar/${data.name}/64">
+const mcName = data.mcUsername || data.name;
+
+<img src="https://mc-heads.net/avatar/${mcName}/64">
 <p>${data.name}</p>
 <span>${data.role}</span>
 `;
