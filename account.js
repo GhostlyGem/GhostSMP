@@ -1,7 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-import { getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
 import {
 getAuth,
 onAuthStateChanged,
@@ -11,8 +9,11 @@ updateProfile
 import {
 getFirestore,
 doc,
-updateDoc
+updateDoc,
+getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* Firebase */
 
 const firebaseConfig = {
 
@@ -26,22 +27,48 @@ appId: "1:415275850062:web:c64aa3147dec2212a7661f"
 };
 
 const app = initializeApp(firebaseConfig);
-
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const input = document.getElementById("display-name");
-const saveBtn = document.getElementById("save-name");
+/* Page Elements */
 
-onAuthStateChanged(auth,(user)=>{
+const displayNameInput = document.getElementById("display-name");
+const saveNameBtn = document.getElementById("save-name");
+
+const mcInput = document.getElementById("mc-username");
+const mcPreview = document.getElementById("mc-preview");
+const saveMcBtn = document.getElementById("save-mc");
+
+const staffArea = document.getElementById("staff-panel-area");
+const staffBtn = document.getElementById("staff-dashboard-btn");
+
+/* Staff Roles */
+
+const staffRoles = [
+"Owner",
+"Head Admin",
+"Admin",
+"Manager",
+"Mod",
+"JrMod",
+"Event Manager"
+];
+
+/* Auth */
+
+onAuthStateChanged(auth, async (user)=>{
 
 if(!user) return;
 
-input.value = user.displayName || "";
+/* Load display name */
 
-saveBtn.onclick = async ()=>{
+displayNameInput.value = user.displayName || "";
 
-const newName = input.value;
+/* Save display name */
+
+saveNameBtn.onclick = async ()=>{
+
+const newName = displayNameInput.value.trim();
 
 await updateProfile(user,{
 displayName:newName
@@ -59,22 +86,27 @@ alert("Name updated!");
 
 };
 
-});
+/* Load user document */
 
-const db = getFirestore();
-const auth = getAuth();
+const userDoc = await getDoc(doc(db,"users",user.uid));
 
-const saveBtn = document.getElementById("save-mc");
+if(!userDoc.exists()) return;
 
-if(saveBtn){
+const role = userDoc.data().role;
 
-saveBtn.onclick = async ()=>{
+/* Show staff tools */
 
-const user = auth.currentUser;
+if(staffRoles.includes(role)){
+staffArea.style.display="block";
+}
 
-if(!user) return;
+/* Save Minecraft username */
 
-const mcName = document.getElementById("mc-username").value.trim();
+if(saveMcBtn){
+
+saveMcBtn.onclick = async ()=>{
+
+const mcName = mcInput.value.trim();
 
 if(mcName.length < 3){
 alert("Invalid Minecraft username");
@@ -91,65 +123,28 @@ alert("Minecraft username saved!");
 
 }
 
-const input = document.getElementById("mc-username");
-const preview = document.getElementById("mc-preview");
+/* Minecraft head preview */
 
-if(input && preview){
+if(mcInput && mcPreview){
 
-input.addEventListener("input",()=>{
+mcInput.addEventListener("input",()=>{
 
-const name = input.value.trim();
+const name = mcInput.value.trim();
 
-preview.src = "https://mc-heads.net/avatar/" + name;
+mcPreview.src = "https://mc-heads.net/avatar/" + name;
 
 });
 
 }
 
-const db = getFirestore();
-const auth = getAuth();
-
-const staffArea = document.getElementById("staff-panel-area");
-const staffBtn = document.getElementById("staff-dashboard-btn");
-
-const staffRoles = [
-"Owner",
-"Head Admin",
-"Admin",
-"Manager",
-"Mod",
-"JrMod",
-"Event Manager"
-];
-
-onAuthStateChanged(auth, async (user)=>{
-
-if(!user) return;
-
-const userDoc = await getDoc(doc(db,"users",user.uid));
-
-if(!userDoc.exists()) return;
-
-const role = userDoc.data().role;
-
-/* Show staff button only for staff */
-
-if(staffRoles.includes(role)){
-
-staffArea.style.display="block";
-
-}
-
 });
 
-/* Redirect */
+/* Staff dashboard redirect */
 
 if(staffBtn){
 
 staffBtn.onclick = ()=>{
-
 window.location.href="/staff.html";
-
 };
 
 }
