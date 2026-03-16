@@ -88,3 +88,18 @@ alert("Minecraft username saved!");
 };
 
 }
+
+const input = document.getElementById("mc-username");
+const preview = document.getElementById("mc-preview");
+
+if(input && preview){
+
+input.addEventListener("input",()=>{
+
+const name = input.value.trim();
+
+preview.src = "https://mc-heads.net/avatar/" + name;
+
+});
+
+}
