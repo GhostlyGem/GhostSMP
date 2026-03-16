@@ -199,7 +199,37 @@ Role: ${data.role}
 const promoteBtn = div.querySelector(".promote");
 const demoteBtn = div.querySelector(".demote");
 
-/* Disable controls if not allowed */
+/* ---------------- Safety Locks ---------------- */
+
+/* Nobody can modify the Owner */
+if(data.role === "Owner"){
+
+promoteBtn.disabled = true;
+demoteBtn.disabled = true;
+
+}
+
+/* Owner cannot demote themselves */
+
+const currentUser = auth.currentUser;
+
+if(currentUser && currentUser.uid === uid){
+
+demoteBtn.disabled = true;
+
+}
+
+/* Head Admin limitations */
+
+if(currentUserRole === "Head Admin"){
+
+if(data.role === "Admin"){
+promoteBtn.disabled = true;
+}
+
+}
+
+/* Non-admin staff cannot manage roles */
 
 if(currentUserRole !== "Owner" && currentUserRole !== "Head Admin"){
 
@@ -208,7 +238,7 @@ demoteBtn.disabled = true;
 
 }
 
-/* Promote */
+/* ---------------- Promote ---------------- */
 
 promoteBtn.onclick = async ()=>{
 
@@ -218,13 +248,21 @@ if(currentIndex <= 0) return;
 
 const newRole = rankOrder[currentIndex-1];
 
+/* Prevent promoting to Owner */
+
+if(newRole === "Owner") return;
+
+/* Head Admin cannot promote above Admin */
+
+if(currentUserRole === "Head Admin" && newRole === "Head Admin") return;
+
 await updateDoc(doc(db,"users",uid),{
 role:newRole
 });
 
 };
 
-/* Demote */
+/* ---------------- Demote ---------------- */
 
 demoteBtn.onclick = async ()=>{
 
