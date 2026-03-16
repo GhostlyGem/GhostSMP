@@ -6,29 +6,14 @@ collection,
 onSnapshot,
 doc,
 updateDoc,
-getDoc
+getDoc,
+addDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import {
 getAuth,
 onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-import { addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-async function logAction(action){
-
-const user = auth.currentUser;
-
-if(!user) return;
-
-await addDoc(collection(db,"staffLogs"),{
-staff:user.displayName,
-action:action,
-timestamp:Date.now()
-});
-
-}
 
 /* Firebase */
 
@@ -50,6 +35,7 @@ const auth = getAuth();
 const loading = document.getElementById("loading");
 const dashboard = document.getElementById("dashboard");
 const applicationsDiv = document.getElementById("applications");
+const staffList = document.getElementById("staff-list");
 
 /* Roles */
 
@@ -68,7 +54,36 @@ const approvalRoles = [
 "Head Admin"
 ];
 
-/* Auth */
+/* Rank order */
+
+const rankOrder = [
+"Owner",
+"Head Admin",
+"Admin",
+"Manager",
+"Mod",
+"JrMod",
+"Event Manager",
+"player"
+];
+
+/* ---------------- Staff Log ---------------- */
+
+async function logAction(action){
+
+const user = auth.currentUser;
+
+if(!user) return;
+
+await addDoc(collection(db,"staffLogs"),{
+staff:user.displayName,
+action:action,
+timestamp:Date.now()
+});
+
+}
+
+/* ---------------- Auth Check ---------------- */
 
 onAuthStateChanged(auth, async (user)=>{
 
@@ -102,7 +117,7 @@ loadLogs();
 
 });
 
-/* Load Applications */
+/* ---------------- Applications ---------------- */
 
 function loadApplications(role){
 
@@ -124,9 +139,7 @@ div.className="application";
 div.innerHTML = `
 <b>${data.name}</b>
 <div class="rank">Requested Rank: ${data.rank || "Staff"}</div>
-
 <p>${data.reason || ""}</p>
-
 <button class="approve">Approve</button>
 <button class="deny">Deny</button>
 `;
@@ -134,13 +147,9 @@ div.innerHTML = `
 const approveBtn = div.querySelector(".approve");
 const denyBtn = div.querySelector(".deny");
 
-/* Only Owner / Head Admin can approve */
-
 if(!approvalRoles.includes(role)){
-
 approveBtn.disabled = true;
 denyBtn.disabled = true;
-
 }
 
 /* Approve */
@@ -175,21 +184,7 @@ applicationsDiv.appendChild(div);
 
 }
 
-
 /* ---------------- Staff Management ---------------- */
-
-const staffList = document.getElementById("staff-list");
-
-const rankOrder = [
-"Owner",
-"Head Admin",
-"Admin",
-"Manager",
-"Mod",
-"JrMod",
-"Event Manager",
-"player"
-];
 
 function loadStaff(currentUserRole){
 
@@ -218,58 +213,31 @@ Role: ${data.role}
 `;
 
 const promoteBtn = div.querySelector(".promote");
-await updateDoc(doc(db,"users",uid),{
-role:newRole
-});
-
-await logAction(`${auth.currentUser.displayName} promoted ${data.name} → ${newRole}`);
 const demoteBtn = div.querySelector(".demote");
-await updateDoc(doc(db,"users",uid),{
-role:newRole
-});
 
-await logAction(`${auth.currentUser.displayName} demoted ${data.name} → ${newRole}`);
-  
-/* ---------------- Safety Locks ---------------- */
+/* Safety Locks */
 
-/* Nobody can modify the Owner */
 if(data.role === "Owner"){
-
 promoteBtn.disabled = true;
 demoteBtn.disabled = true;
-
 }
-
-/* Owner cannot demote themselves */
 
 const currentUser = auth.currentUser;
 
 if(currentUser && currentUser.uid === uid){
-
 demoteBtn.disabled = true;
-
 }
 
-/* Head Admin limitations */
-
-if(currentUserRole === "Head Admin"){
-
-if(data.role === "Admin"){
+if(currentUserRole === "Head Admin" && data.role === "Admin"){
 promoteBtn.disabled = true;
 }
-
-}
-
-/* Non-admin staff cannot manage roles */
 
 if(currentUserRole !== "Owner" && currentUserRole !== "Head Admin"){
-
 promoteBtn.disabled = true;
 demoteBtn.disabled = true;
-
 }
 
-/* ---------------- Promote ---------------- */
+/* Promote */
 
 promoteBtn.onclick = async ()=>{
 
@@ -279,11 +247,7 @@ if(currentIndex <= 0) return;
 
 const newRole = rankOrder[currentIndex-1];
 
-/* Prevent promoting to Owner */
-
 if(newRole === "Owner") return;
-
-/* Head Admin cannot promote above Admin */
 
 if(currentUserRole === "Head Admin" && newRole === "Head Admin") return;
 
@@ -291,9 +255,11 @@ await updateDoc(doc(db,"users",uid),{
 role:newRole
 });
 
+await logAction(`${auth.currentUser.displayName} promoted ${data.name} → ${newRole}`);
+
 };
 
-/* ---------------- Demote ---------------- */
+/* Demote */
 
 demoteBtn.onclick = async ()=>{
 
@@ -307,6 +273,8 @@ await updateDoc(doc(db,"users",uid),{
 role:newRole
 });
 
+await logAction(`${auth.currentUser.displayName} demoted ${data.name} → ${newRole}`);
+
 };
 
 staffList.appendChild(div);
@@ -314,6 +282,10 @@ staffList.appendChild(div);
 });
 
 });
+
+}
+
+/* ---------------- Staff Logs ---------------- */
 
 function loadLogs(){
 
@@ -330,8 +302,6 @@ const logs = [];
 snapshot.forEach((doc)=>{
 logs.push(doc.data());
 });
-
-/* newest first */
 
 logs.sort((a,b)=> b.timestamp - a.timestamp);
 
@@ -353,7 +323,5 @@ logsDiv.appendChild(div);
 });
 
 });
-
-}
 
 }
