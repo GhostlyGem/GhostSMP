@@ -152,3 +152,97 @@ applicationsDiv.appendChild(div);
 });
 
 }
+
+
+/* ---------------- Staff Management ---------------- */
+
+const staffList = document.getElementById("staff-list");
+
+const rankOrder = [
+"Owner",
+"Head Admin",
+"Admin",
+"Manager",
+"Mod",
+"JrMod",
+"Event Manager",
+"player"
+];
+
+function loadStaff(currentUserRole){
+
+const usersRef = collection(db,"users");
+
+onSnapshot(usersRef,(snapshot)=>{
+
+staffList.innerHTML="";
+
+snapshot.forEach((userDoc)=>{
+
+const data = userDoc.data();
+const uid = userDoc.id;
+
+const div = document.createElement("div");
+div.className="application";
+
+div.innerHTML = `
+<b>${data.name}</b><br>
+Role: ${data.role}
+
+<br><br>
+
+<button class="promote">Promote</button>
+<button class="demote">Demote</button>
+`;
+
+const promoteBtn = div.querySelector(".promote");
+const demoteBtn = div.querySelector(".demote");
+
+/* Disable controls if not allowed */
+
+if(currentUserRole !== "Owner" && currentUserRole !== "Head Admin"){
+
+promoteBtn.disabled = true;
+demoteBtn.disabled = true;
+
+}
+
+/* Promote */
+
+promoteBtn.onclick = async ()=>{
+
+const currentIndex = rankOrder.indexOf(data.role);
+
+if(currentIndex <= 0) return;
+
+const newRole = rankOrder[currentIndex-1];
+
+await updateDoc(doc(db,"users",uid),{
+role:newRole
+});
+
+};
+
+/* Demote */
+
+demoteBtn.onclick = async ()=>{
+
+const currentIndex = rankOrder.indexOf(data.role);
+
+if(currentIndex === -1 || currentIndex >= rankOrder.length-1) return;
+
+const newRole = rankOrder[currentIndex+1];
+
+await updateDoc(doc(db,"users",uid),{
+role:newRole
+});
+
+};
+
+staffList.appendChild(div);
+
+});
+
+});
+
+}
