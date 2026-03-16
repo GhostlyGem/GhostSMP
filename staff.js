@@ -14,6 +14,22 @@ getAuth,
 onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+import { addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+async function logAction(action){
+
+const user = auth.currentUser;
+
+if(!user) return;
+
+await addDoc(collection(db,"staffLogs"),{
+staff:user.displayName,
+action:action,
+timestamp:Date.now()
+});
+
+}
+
 /* Firebase */
 
 const firebaseConfig = {
