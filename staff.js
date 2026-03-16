@@ -81,6 +81,7 @@ loading.style.display="none";
 dashboard.style.display="block";
 
 loadApplications(role);
+loadStaff(role);
 
 });
 
