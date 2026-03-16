@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<title>Staff Dashboard</title>
+
+<title>GhostSMP Staff Panel</title>
+
 <style>
 
 body{
@@ -11,19 +14,36 @@ color:white;
 padding:40px;
 }
 
+/* Header */
+
+h1{
+margin-bottom:10px;
+}
+
+#pending-count{
+color:#ccc;
+margin-bottom:25px;
+}
+
+/* Applications */
+
 .application{
 background:#1e1e1e;
 padding:20px;
 margin-bottom:15px;
 border-radius:8px;
+border-left:4px solid #444;
 }
+
+/* Buttons */
 
 button{
 margin-right:10px;
-padding:6px 12px;
+padding:7px 14px;
 border:none;
-border-radius:5px;
+border-radius:6px;
 cursor:pointer;
+font-weight:bold;
 }
 
 .approve{
@@ -36,21 +56,33 @@ background:#e74c3c;
 color:white;
 }
 
+button:disabled{
+opacity:0.4;
+cursor:not-allowed;
+}
+
+/* Loading */
+
+#loading{
+color:#aaa;
+}
+
 </style>
+
 </head>
 
 <body>
 
 <h1>Staff Dashboard</h1>
+
+<h2 id="pending-count">Pending Applications (0)</h2>
+
 <p id="loading">Checking permissions...</p>
 
 <div id="applications" style="display:none;"></div>
-  
-<h1>Staff Applications</h1>
-
-<div id="applications"></div>
 
 <script type="module" src="staff.js"></script>
 
 </body>
+
 </html>
