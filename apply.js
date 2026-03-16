@@ -1,5 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
+import { query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
 import {
 getFirestore,
 collection,
@@ -27,6 +29,19 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 const form = document.getElementById("app-form");
+
+const q = query(
+collection(db,"applications"),
+where("user","==",user.uid),
+where("status","==","pending")
+);
+
+const existing = await getDocs(q);
+
+if(!existing.empty){
+alert("You already have a pending application.");
+return;
+}
 
 form.addEventListener("submit", async (e)=>{
 
