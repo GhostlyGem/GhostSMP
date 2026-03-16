@@ -55,36 +55,17 @@ fetch("https://api.mcsrvstat.us/2/mc.ghostsurvival.net")
 
 /* ---------------- Players On Website ---------------- */
 
-const playersContainer = document.getElementById("website-players");
+const playersCount = document.getElementById("website-players-count");
 
-if(playersContainer){
+if(playersCount){
 
   const websitePlayersRef = collection(db,"websiteOnline");
 
-  onSnapshot(websitePlayersRef, (snapshot)=>{
+  onSnapshot(websitePlayersRef,(snapshot)=>{
 
-    playersContainer.innerHTML = "";
+    const count = snapshot.size;
 
-    if(snapshot.empty){
-      playersContainer.innerHTML = "<p>No players online</p>";
-      return;
-    }
-
-    snapshot.forEach((doc)=>{
-
-      const data = doc.data();
-
-      const playerDiv = document.createElement("div");
-      playerDiv.className = "player";
-
-      playerDiv.innerHTML = `
-        <img src="https://crafatar.com/avatars/${doc.id}?size=32&overlay">
-        <span>${data.name}</span>
-      `;
-
-      playersContainer.appendChild(playerDiv);
-
-    });
+    playersCount.innerText = "Players on Website (" + count + ")";
 
   });
 
