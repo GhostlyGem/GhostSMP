@@ -1,5 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
+import { getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
 import {
 getAuth,
 onAuthStateChanged,
@@ -101,5 +103,53 @@ const name = input.value.trim();
 preview.src = "https://mc-heads.net/avatar/" + name;
 
 });
+
+}
+
+const db = getFirestore();
+const auth = getAuth();
+
+const staffArea = document.getElementById("staff-panel-area");
+const staffBtn = document.getElementById("staff-dashboard-btn");
+
+const staffRoles = [
+"Owner",
+"Head Admin",
+"Admin",
+"Manager",
+"Mod",
+"JrMod",
+"Event Manager"
+];
+
+onAuthStateChanged(auth, async (user)=>{
+
+if(!user) return;
+
+const userDoc = await getDoc(doc(db,"users",user.uid));
+
+if(!userDoc.exists()) return;
+
+const role = userDoc.data().role;
+
+/* Show staff button only for staff */
+
+if(staffRoles.includes(role)){
+
+staffArea.style.display="block";
+
+}
+
+});
+
+/* Redirect */
+
+if(staffBtn){
+
+staffBtn.onclick = ()=>{
+
+window.location.href="/staff.html";
+
+};
 
 }
