@@ -354,6 +354,25 @@ border-radius:4px;
 margin-bottom:8px;
 }
 
+#staff-container{
+display:flex;
+flex-wrap:wrap;
+gap:20px;
+justify-content:center;
+}
+
+.staff-card{
+background:#1e1e1e;
+padding:20px;
+border-radius:10px;
+text-align:center;
+width:150px;
+color:white;
+}
+
+.staff-card img{
+border-radius:8px;
+}
 .staff-card span{
 display:block;
 font-size:12px;
