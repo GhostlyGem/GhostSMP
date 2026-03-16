@@ -14,7 +14,7 @@ getAuth,
 onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-/* ---------------- Firebase Setup ---------------- */
+/* Firebase */
 
 const firebaseConfig = {
 apiKey: "AIzaSyC9bCU2pRu0VGi0chBDdupYPSo5FxPSimo",
@@ -29,15 +29,15 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
 
-/* ---------------- Page Elements ---------------- */
+/* Page elements */
 
+const loading = document.getElementById("loading");
+const dashboard = document.getElementById("dashboard");
 const applicationsDiv = document.getElementById("applications");
-const loadingText = document.getElementById("loading");
-const pendingCounter = document.getElementById("pending-count");
 
-/* ---------------- Rank Structure ---------------- */
+/* Roles */
 
-const allowedRoles = [
+const staffRoles = [
 "Owner",
 "Head Admin",
 "Admin",
@@ -52,7 +52,7 @@ const approvalRoles = [
 "Head Admin"
 ];
 
-/* ---------------- Auth Check ---------------- */
+/* Auth */
 
 onAuthStateChanged(auth, async (user)=>{
 
@@ -61,8 +61,6 @@ window.location.href="/";
 return;
 }
 
-/* Get User Role */
-
 const userDoc = await getDoc(doc(db,"users",user.uid));
 
 if(!userDoc.exists()){
@@ -70,27 +68,23 @@ window.location.href="/";
 return;
 }
 
-const role = userDoc.data().role;
+const role = userDoc.data().role?.trim();
 
-/* Check if user can access panel */
-
-if(!allowedRoles.includes(role)){
+if(!staffRoles.includes(role)){
 window.location.href="/";
 return;
 }
 
-/* Access Granted */
+/* Access granted */
 
-if(loadingText) loadingText.style.display="none";
-if(applicationsDiv) applicationsDiv.style.display="block";
-
-/* Load applications */
+loading.style.display="none";
+dashboard.style.display="block";
 
 loadApplications(role);
 
 });
 
-/* ---------------- Load Applications ---------------- */
+/* Load Applications */
 
 function loadApplications(role){
 
@@ -100,52 +94,40 @@ onSnapshot(appsRef,(snapshot)=>{
 
 applicationsDiv.innerHTML="";
 
-let pending = 0;
-
 snapshot.forEach((appDoc)=>{
 
 const data = appDoc.data();
 
-if(data.status === "pending"){
-pending++;
-}
+if(data.status !== "pending") return;
 
 const div = document.createElement("div");
-div.className = "application";
-
-/* Application Card */
+div.className="application";
 
 div.innerHTML = `
-<h3>${data.name}</h3>
+<b>${data.name}</b>
+<div class="rank">Requested Rank: ${data.rank || "Staff"}</div>
 
-<p><b>Status:</b> ${data.status}</p>
-
-<p><b>Applying For:</b> ${data.position || "Staff"}</p>
-
-<p><b>Why should we choose you?</b></p>
-<p>${data.reason || "No response provided."}</p>
+<p>${data.reason || ""}</p>
 
 <button class="approve">Approve</button>
 <button class="deny">Deny</button>
 `;
 
-/* Buttons */
-
 const approveBtn = div.querySelector(".approve");
 const denyBtn = div.querySelector(".deny");
 
-/* Disable buttons if not Owner or Head Admin */
+/* Only Owner / Head Admin can approve */
 
 if(!approvalRoles.includes(role)){
+
 approveBtn.disabled = true;
 denyBtn.disabled = true;
+
 }
 
 /* Approve */
 
 approveBtn.onclick = async ()=>{
-
-if(!approvalRoles.includes(role)) return;
 
 await updateDoc(doc(db,"applications",appDoc.id),{
 status:"approved"
@@ -157,8 +139,6 @@ status:"approved"
 
 denyBtn.onclick = async ()=>{
 
-if(!approvalRoles.includes(role)) return;
-
 await updateDoc(doc(db,"applications",appDoc.id),{
 status:"denied"
 });
@@ -168,12 +148,6 @@ status:"denied"
 applicationsDiv.appendChild(div);
 
 });
-
-/* Update Pending Counter */
-
-if(pendingCounter){
-pendingCounter.innerText = "Pending Applications ("+pending+")";
-}
 
 });
 
