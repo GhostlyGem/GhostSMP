@@ -43,29 +43,37 @@ alert("You already have a pending application.");
 return;
 }
 
-form.addEventListener("submit", async (e)=>{
+const submitBtn = document.getElementById("submit-app");
 
-e.preventDefault();
+submitBtn.onclick = async ()=>{
 
-const mcname = document.getElementById("mcname").value;
-const age = document.getElementById("age").value;
-const experience = document.getElementById("experience").value;
-const reason = document.getElementById("reason").value;
+const user = auth.currentUser;
+if(!user) return;
+
+const mcname = document.getElementById("app-mcname").value.trim();
+const age = document.getElementById("app-age").value.trim();
+const why = document.getElementById("app-why").value.trim();
+const experience = document.getElementById("app-experience").value.trim();
+const activity = document.getElementById("app-activity").value.trim();
 
 await addDoc(collection(db,"applications"),{
 
+name: user.displayName,
+uid: user.uid,
+
 mcname: mcname,
 age: age,
+why: why,
 experience: experience,
-reason: reason,
-status: "pending",
-user: auth.currentUser.uid,
-timestamp: Date.now()
+activity: activity,
+
+status:"pending",
+timestamp:Date.now()
 
 });
 
 alert("Application submitted!");
 
-form.reset();
+};
 
-});
+form.reset();
