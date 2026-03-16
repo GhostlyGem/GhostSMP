@@ -43,7 +43,7 @@ alert("You already have a pending application.");
 return;
 }
 
-const submitBtn = document.getElementById("submit-app");
+const submitBtn = document.getElementById("submit-app"); /* submit-app? */
 
 submitBtn.onclick = async ()=>{
 
@@ -51,10 +51,12 @@ const user = auth.currentUser;
 if(!user) return;
 
 const mcname = document.getElementById("app-mcname").value.trim();
-const age = document.getElementById("app-age").value.trim();
-const why = document.getElementById("app-why").value.trim();
-const experience = document.getElementById("app-experience").value.trim();
-const activity = document.getElementById("app-activity").value.trim();
+const rank = document.getElementById("app-rank").value.trim();
+const dcname = document.getElementById("app-dcname").value.trim();
+const experience = document.getElementById("app-timezone").value.trim();
+const activity = document.getElementById("app-dob").value.trim();
+
+/* continue the list */
 
 await addDoc(collection(db,"applications"),{
 
