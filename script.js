@@ -95,6 +95,7 @@ loadServerStatus();
 
 /* ---------------- Players On Website ---------------- */
 
+const playersCount = document.getElementById("website-players-count");
 
 if(playersCount){
 
