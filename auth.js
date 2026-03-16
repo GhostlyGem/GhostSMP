@@ -12,8 +12,12 @@ import {
   getFirestore,
   doc,
   setDoc,
+  getDoc,
+  updateDoc,
   deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* ---------------- Firebase Setup ---------------- */
 
 const firebaseConfig = {
   apiKey: "AIzaSyC9bCU2pRu0VGi0chBDdupYPSo5FxPSimo",
@@ -32,12 +36,18 @@ const provider = new GoogleAuthProvider();
 
 const authArea = document.getElementById("auth-area");
 
+/* ---------------- Login ---------------- */
+
 function login(){
+
   signInWithPopup(auth, provider)
   .catch((error)=>{
     console.error("Login error:", error);
   });
+
 }
+
+/* ---------------- Logged Out UI ---------------- */
 
 function showLoggedOutUI(){
 
@@ -56,6 +66,8 @@ function showLoggedOutUI(){
 
 }
 
+/* ---------------- Logged In UI ---------------- */
+
 function showLoggedInUI(user){
 
   if(!authArea) return;
@@ -72,12 +84,17 @@ function showLoggedInUI(user){
 
   if(logoutBtn){
     logoutBtn.addEventListener("click", async ()=>{
+
       await deleteDoc(doc(db,"websiteOnline",user.uid));
+
       signOut(auth);
+
     });
   }
 
 }
+
+/* ---------------- Auth State ---------------- */
 
 onAuthStateChanged(auth, async (user)=>{
 
@@ -85,24 +102,51 @@ onAuthStateChanged(auth, async (user)=>{
 
     try{
 
+      const userRef = doc(db,"users",user.uid);
+      const userSnap = await getDoc(userRef);
+
+      /* Track website online users */
+
       await setDoc(doc(db,"websiteOnline",user.uid),{
         name:user.displayName,
         timestamp:Date.now()
       });
 
-      await setDoc(doc(db,"users",user.uid),{
-        name:user.displayName,
-        role:"player",
-        lastLogin:Date.now()
-      },{merge:true});
+      /* Create user ONLY if first login */
 
-      // Remove user if they close the tab
+      if(!userSnap.exists()){
+
+        await setDoc(userRef,{
+          name:user.displayName,
+          role:"player",
+          mcUsername:"",
+          created:Date.now(),
+          lastLogin:Date.now()
+        });
+
+        console.log("New user created");
+
+      }else{
+
+        /* Update login time but KEEP role */
+
+        await updateDoc(userRef,{
+          name:user.displayName,
+          lastLogin:Date.now()
+        });
+
+      }
+
+      /* Remove user when tab closes */
+
       window.addEventListener("beforeunload", ()=>{
         deleteDoc(doc(db,"websiteOnline",user.uid));
       });
 
     }catch(err){
+
       console.error("Firestore error:", err);
+
     }
 
     showLoggedInUI(user);
