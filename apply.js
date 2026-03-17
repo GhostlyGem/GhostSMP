@@ -1,5 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
 import {
 getFirestore,
 collection,
@@ -92,6 +94,19 @@ alert("You must accept the rules.");
 return;
 }
 
+const settingsDoc = await getDoc(doc(db,"settings","applications"));
+
+if(settingsDoc.exists()){
+
+const settings = settingsDoc.data();
+
+if(settings[data.rank] === false){
+alert("This role is currently CLOSED.");
+return;
+}
+
+}
+  
 /* Submit */
 
 await addDoc(collection(db,"applications"), data);
