@@ -35,6 +35,32 @@ const form = document.getElementById("app-form");
 
 /* Wait for auth */
 
+import { onSnapshot, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const rankSelect = document.getElementById("app-rank");
+
+onSnapshot(doc(db,"settings","applications"), (docSnap)=>{
+
+if(!docSnap.exists()) return;
+
+const settings = docSnap.data();
+
+Array.from(rankSelect.options).forEach(option=>{
+
+if(!option.value) return;
+
+const isOpen = settings[option.value];
+
+option.textContent = `${option.value} (${isOpen ? "OPEN" : "CLOSED"})`;
+
+if(!isOpen){
+option.disabled = true;
+}
+
+});
+
+});
+
 onAuthStateChanged(auth,(user)=>{
 
 if(!user) return;
