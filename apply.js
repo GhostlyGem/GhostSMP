@@ -49,12 +49,16 @@ if(!option.value) return;
 
 const isOpen = settings[option.value];
 
-option.textContent = `${option.value} (${isOpen ? "OPEN" : "CLOSED"})`;
+if(isOpen === undefined){
+option.textContent = `${option.value} (UNKNOWN)`;
+option.disabled = true;
+return;
+}
 
+option.textContent = `${option.value} (${isOpen ? "OPEN" : "CLOSED"})`;
 option.disabled = !isOpen;
 
 });
-
 });
 
 /* 🔐 AUTH */
