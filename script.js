@@ -1,5 +1,13 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+getFirestore,
+collection,
+onSnapshot,
+query,
+where,
+updateDoc,
+doc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 /* ---------------- Firebase Setup ---------------- */
@@ -167,7 +175,7 @@ if(!user) return;
 
 const q = query(
 collection(db,"applications"),
-where("user","==",user.uid)
+where("uid","==",user.uid)
 );
 
 onSnapshot(q,(snapshot)=>{
@@ -201,12 +209,13 @@ function showApprovalPopup(appId){
 const popup=document.createElement("div");
 
 popup.innerHTML=`
-🎉 Your staff application was approved!
-<br><br>
+<div style="font-size:30px;">✔️</div>
+<h3>Application Approved</h3>
 <button id="popup-ok">OK</button>
 `;
 
 stylePopup(popup);
+popup.style.background="#2ecc71";
 
 document.body.appendChild(popup);
 
@@ -227,12 +236,13 @@ function showDeniedPopup(appId){
 const popup=document.createElement("div");
 
 popup.innerHTML=`
-❌ Your staff application was denied.
-<br><br>
+<div style="font-size:30px;">❌</div>
+<h3>Application Denied</h3>
 <button id="popup-ok">OK</button>
 `;
 
 stylePopup(popup);
+popup.style.background="#e74c3c";
 
 document.body.appendChild(popup);
 
