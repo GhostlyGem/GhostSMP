@@ -138,8 +138,22 @@ div.className="application";
 
 div.innerHTML = `
 <b>${data.name}</b>
+
 <div class="rank">Requested Rank: ${data.rank || "Staff"}</div>
-<p>${data.reason || ""}</p>
+
+<p><b>Minecraft:</b> ${data.mcname}</p>
+<p><b>Discord:</b> ${data.discord}</p>
+<p><b>Timezone:</b> ${data.timezone}</p>
+<p><b>DOB:</b> ${data.dob}</p>
+<p><b>In-game Rank:</b> ${data.ingameRank}</p>
+
+<p><b>Helpful:</b><br>${data.helpful}</p>
+<p><b>Availability:</b><br>${data.availability}</p>
+<p><b>Personality:</b><br>${data.aspects}</p>
+<p><b>Interest:</b><br>${data.interest}</p>
+
+<p><b>Rules Accepted:</b> ${data.rulesAccepted}</p>
+
 <button class="approve">Approve</button>
 <button class="deny">Deny</button>
 `;
