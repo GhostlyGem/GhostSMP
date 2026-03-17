@@ -59,13 +59,38 @@ option.disabled = !isOpen;
 
 /* 🔐 AUTH */
 
-onAuthStateChanged(auth,(user)=>{
+onAuthStateChanged(auth, async (user)=>{
 
 if(!user){
 alert("You must be logged in.");
 return;
 }
 
+const roleText = document.getElementById("role-text");
+
+try{
+
+const userDoc = await getDoc(doc(db,"users",user.uid));
+
+if(userDoc.exists()){
+
+const role = userDoc.data().role || "Player";
+
+roleText.innerText = role;
+
+}else{
+
+roleText.innerText = "Player";
+
+}
+
+}catch(err){
+
+console.error("ROLE ERROR:", err);
+roleText.innerText = "Error";
+
+}
+  
 /* 📩 SUBMIT */
 
 form.addEventListener("submit", async (e)=>{
