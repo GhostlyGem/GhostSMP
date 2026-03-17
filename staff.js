@@ -178,6 +178,11 @@ await logAction(`${auth.currentUser.displayName} approved ${data.name}'s applica
 
 };
 
+await updateDoc(doc(db,"applications",appDoc.id),{
+status:"approved",
+acknowledged:false
+});
+
 /* Deny */
 
 denyBtn.onclick = async ()=>{
@@ -192,6 +197,11 @@ await logAction(`${auth.currentUser.displayName} denied ${data.name}'s applicati
 
 applicationsDiv.appendChild(div);
 
+});
+
+await updateDoc(doc(db,"applications",appDoc.id),{
+status:"denied",
+acknowledged:false
 });
 
 });
