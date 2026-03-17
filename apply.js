@@ -1,38 +1,53 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-import { query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
 import {
 getFirestore,
 collection,
-addDoc
+addDoc,
+query,
+where,
+getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import {
-getAuth
+getAuth,
+onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-const firebaseConfig = {
+/* Firebase */
 
+const firebaseConfig = {
 apiKey: "AIzaSyC9bCU2pRu0VGi0chBDdupYPSo5FxPSimo",
 authDomain: "ghostsmp-bf0a3.firebaseapp.com",
 projectId: "ghostsmp-bf0a3",
 storageBucket: "ghostsmp-bf0a3.firebasestorage.app",
 messagingSenderId: "415275850062",
 appId: "1:415275850062:web:c64aa3147dec2212a7661f"
-
 };
 
 const app = initializeApp(firebaseConfig);
-
 const db = getFirestore(app);
 const auth = getAuth(app);
 
 const form = document.getElementById("app-form");
 
+/* Wait for auth */
+
+onAuthStateChanged(auth,(user)=>{
+
+if(!user) return;
+
+/* Submit */
+
+form.addEventListener("submit", async (e)=>{
+
+e.preventDefault();
+
+/* Prevent duplicate apps */
+
 const q = query(
 collection(db,"applications"),
-where("user","==",user.uid),
+where("uid","==",user.uid),
 where("status","==","pending")
 );
 
@@ -43,39 +58,48 @@ alert("You already have a pending application.");
 return;
 }
 
-const submitBtn = document.getElementById("submit-app"); /* submit-app? */
+/* Get values */
 
-submitBtn.onclick = async ()=>{
-
-const user = auth.currentUser;
-if(!user) return;
-
-const mcname = document.getElementById("app-mcname").value.trim();
-const rank = document.getElementById("app-rank").value.trim();
-const dcname = document.getElementById("app-dcname").value.trim();
-const experience = document.getElementById("app-timezone").value.trim();
-const activity = document.getElementById("app-dob").value.trim();
-
-/* continue the list */
-
-await addDoc(collection(db,"applications"),{
-
+const data = {
 name: user.displayName,
 uid: user.uid,
 
-mcname: mcname,
-age: age,
-why: why,
-experience: experience,
-activity: activity,
+mcname: document.getElementById("mcname").value.trim(),
+rank: document.getElementById("app-rank").value,
+discord: document.getElementById("dcname").value.trim(),
+timezone: document.getElementById("timezone").value.trim(),
+dob: document.getElementById("dob").value.trim(),
+ingameRank: document.getElementById("ingamerank").value.trim(),
+helpful: document.getElementById("helpful").value.trim(),
+availability: document.getElementById("availability").value.trim(),
+aspects: document.getElementById("aspects").value.trim(),
+interest: document.getElementById("interest").value.trim(),
+rulesAccepted: document.getElementById("yes-no").value,
 
 status:"pending",
 timestamp:Date.now()
+};
 
-});
+/* Basic validation */
+
+if(!data.rank){
+alert("Please select a role.");
+return;
+}
+
+if(data.rulesAccepted !== "Yes"){
+alert("You must accept the rules.");
+return;
+}
+
+/* Submit */
+
+await addDoc(collection(db,"applications"), data);
 
 alert("Application submitted!");
 
-};
-
 form.reset();
+
+});
+
+});
