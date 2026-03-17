@@ -35,6 +35,12 @@ const form = document.getElementById("app-form");
 
 /* Wait for auth */
 
+setTimeout(()=>{
+if(roleText.innerText === "(Checking...)"){
+roleText.innerText = "Unknown";
+}
+}, 3000);
+
 import { onSnapshot, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const rankSelect = document.getElementById("app-rank");
@@ -132,6 +138,19 @@ return;
 }
 
 }
+
+submitBtn.onclick = async ()=>{
+
+const rulesAccepted = document.getElementById("rules-checkbox").checked;
+
+if(!rulesAccepted){
+alert("You must accept the rules!");
+return;
+}
+
+/* continue submit... */
+
+};
   
 /* Submit */
 
@@ -144,3 +163,22 @@ form.reset();
 });
 
 });
+
+
+try{
+
+await addDoc(collection(db,"applications"),{
+name: currentUser.displayName,
+uid: currentUser.uid,
+status: "pending",
+timestamp: Date.now()
+});
+
+alert("Application submitted!");
+
+}catch(err){
+
+console.error("APPLICATION ERROR:", err);
+alert("Something went wrong. Check console.");
+
+}
