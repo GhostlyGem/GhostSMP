@@ -1,14 +1,15 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
 import {
 getFirestore,
 collection,
 addDoc,
 query,
 where,
-getDocs
+getDocs,
+doc,
+getDoc,
+onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import {
@@ -32,18 +33,9 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 const form = document.getElementById("app-form");
-
-/* Wait for auth */
-
-setTimeout(()=>{
-if(roleText.innerText === "(Checking...)"){
-roleText.innerText = "Unknown";
-}
-}, 3000);
-
-import { onSnapshot, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
 const rankSelect = document.getElementById("app-rank");
+
+/* 🔄 LIVE ROLE OPEN/CLOSED STATUS */
 
 onSnapshot(doc(db,"settings","applications"), (docSnap)=>{
 
@@ -59,25 +51,30 @@ const isOpen = settings[option.value];
 
 option.textContent = `${option.value} (${isOpen ? "OPEN" : "CLOSED"})`;
 
-if(!isOpen){
-option.disabled = true;
-}
+option.disabled = !isOpen;
 
 });
 
 });
+
+/* 🔐 AUTH */
 
 onAuthStateChanged(auth,(user)=>{
 
-if(!user) return;
+if(!user){
+alert("You must be logged in.");
+return;
+}
 
-/* Submit */
+/* 📩 SUBMIT */
 
 form.addEventListener("submit", async (e)=>{
 
 e.preventDefault();
 
-/* Prevent duplicate apps */
+try{
+
+/* 🚫 Prevent duplicate apps */
 
 const q = query(
 collection(db,"applications"),
@@ -92,7 +89,7 @@ alert("You already have a pending application.");
 return;
 }
 
-/* Get values */
+/* 📋 Get values */
 
 const data = {
 name: user.displayName,
@@ -108,13 +105,14 @@ helpful: document.getElementById("helpful").value.trim(),
 availability: document.getElementById("availability").value.trim(),
 aspects: document.getElementById("aspects").value.trim(),
 interest: document.getElementById("interest").value.trim(),
+
 rulesAccepted: document.getElementById("yes-no").value,
 
 status:"pending",
 timestamp:Date.now()
 };
 
-/* Basic validation */
+/* ✅ Validation */
 
 if(!data.rank){
 alert("Please select a role.");
@@ -125,6 +123,8 @@ if(data.rulesAccepted !== "Yes"){
 alert("You must accept the rules.");
 return;
 }
+
+/* 🔒 Check if role is closed */
 
 const settingsDoc = await getDoc(doc(db,"settings","applications"));
 
@@ -139,20 +139,7 @@ return;
 
 }
 
-submitBtn.onclick = async ()=>{
-
-const rulesAccepted = document.getElementById("rules-checkbox").checked;
-
-if(!rulesAccepted){
-alert("You must accept the rules!");
-return;
-}
-
-/* continue submit... */
-
-};
-  
-/* Submit */
+/* 🚀 SUBMIT */
 
 await addDoc(collection(db,"applications"), data);
 
@@ -160,25 +147,13 @@ alert("Application submitted!");
 
 form.reset();
 
-});
-
-});
-
-
-try{
-
-await addDoc(collection(db,"applications"),{
-name: currentUser.displayName,
-uid: currentUser.uid,
-status: "pending",
-timestamp: Date.now()
-});
-
-alert("Application submitted!");
-
 }catch(err){
 
 console.error("APPLICATION ERROR:", err);
 alert("Something went wrong. Check console.");
 
 }
+
+});
+
+});
