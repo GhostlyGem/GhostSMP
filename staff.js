@@ -7,7 +7,8 @@ onSnapshot,
 doc,
 updateDoc,
 getDoc,
-addDoc
+addDoc,
+deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import {
@@ -222,6 +223,8 @@ function loadStaff(currentUserRole){
 
 const usersRef = collection(db,"users");
 
+const currentUserIndex = rankOrder.indexOf(currentUserRole);
+
 onSnapshot(usersRef,(snapshot)=>{
 
 staffList.innerHTML="";
@@ -242,10 +245,12 @@ Role: ${data.role}
 
 <button class="promote">Promote</button>
 <button class="demote">Demote</button>
+<button class="erase">Erase User</button>
 `;
 
 const promoteBtn = div.querySelector(".promote");
 const demoteBtn = div.querySelector(".demote");
+const eraseBtn = div.querySelector(".erase");
 
 /* Safety Locks */
 
@@ -267,6 +272,32 @@ promoteBtn.disabled = true;
 if(currentUserRole !== "Owner" && currentUserRole !== "Head Admin"){
 promoteBtn.disabled = true;
 demoteBtn.disabled = true;
+}
+
+/* 🚫 Cannot erase Owner */
+if(data.role === "Owner"){
+eraseBtn.disabled = true;
+}
+
+/* 🚫 Cannot erase yourself */
+const currentUser = auth.currentUser;
+
+if(currentUser && currentUser.uid === uid){
+eraseBtn.disabled = true;
+}
+
+/* 🚫 JrMod & Event Manager CANNOT erase anyone */
+if(currentUserRole === "JrMod" || currentUserRole === "Event Manager"){
+eraseBtn.disabled = true;
+}
+
+/* 🚫 Can only erase LOWER ranks */
+
+const targetIndex = rankOrder.indexOf(data.role);
+
+/* If target is higher OR same rank → block */
+if(targetIndex <= currentUserIndex){
+eraseBtn.disabled = true;
 }
 
 /* Promote */
@@ -315,6 +346,25 @@ staffList.appendChild(div);
 
 });
 
+eraseBtn.onclick = async ()=>{
+
+if(eraseBtn.disabled) return;
+  
+const confirmDelete = confirm(
+`Are you sure you want to ERASE ${data.name}?\n\nThis cannot be undone.`
+);
+
+if(!confirmDelete) return;
+
+/* 🔥 DELETE USER DATA */
+
+await deleteDoc(doc(db,"users",uid));
+await deleteDoc(doc(db,"websiteOnline",uid));
+
+await logAction(`${auth.currentUser.displayName} ERASED user ${data.name}`);
+
+};
+  
 }
 
 /* ---------------- Staff Logs ---------------- */
