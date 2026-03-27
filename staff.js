@@ -141,6 +141,8 @@ div.innerHTML = `
 
 <div class="rank">Requested Rank: ${data.rank || "Staff"}</div>
 
+<textarea class="notes" placeholder="Staff notes...">${data.notes || ""}</textarea>
+
 <p><b>Minecraft Username:</b> ${data.mcname}</p>
 <p><b>Discord Username:</b> ${data.discord}</p>
 <p><b>Timezone:</b> ${data.timezone}</p>
