@@ -167,6 +167,15 @@ if(!approvalRoles.includes(role)){
 approveBtn.disabled = true;
 denyBtn.disabled = true;
 }
+const notesBox = div.querySelector(".notes");
+
+notesBox.addEventListener("input", async ()=>{
+
+await updateDoc(doc(db,"applications",appDoc.id),{
+notes: notesBox.value
+});
+
+});
 
 /* Approve */
 
