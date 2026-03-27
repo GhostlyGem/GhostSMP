@@ -171,24 +171,21 @@ denyBtn.disabled = true;
 approveBtn.onclick = async ()=>{
 
 await updateDoc(doc(db,"applications",appDoc.id),{
-status:"approved"
+status:"approved",
+acknowledged:false
 });
 
 await logAction(`${auth.currentUser.displayName} approved ${data.name}'s application`);
 
 };
 
-await updateDoc(doc(db,"applications",appDoc.id),{
-status:"approved",
-acknowledged:false
-});
-
 /* Deny */
 
 denyBtn.onclick = async ()=>{
 
 await updateDoc(doc(db,"applications",appDoc.id),{
-status:"denied"
+status:"denied",
+acknowledged:false
 });
 
 await logAction(`${auth.currentUser.displayName} denied ${data.name}'s application`);
@@ -197,11 +194,6 @@ await logAction(`${auth.currentUser.displayName} denied ${data.name}'s applicati
 
 applicationsDiv.appendChild(div);
 
-});
-
-await updateDoc(doc(db,"applications",appDoc.id),{
-status:"denied",
-acknowledged:false
 });
 
 });
