@@ -141,8 +141,6 @@ div.innerHTML = `
 
 <div class="rank">Requested Rank: ${data.rank || "Staff"}</div>
 
-<textarea class="notes" placeholder="Staff notes...">${data.notes || ""}</textarea>
-
 <p><b>Minecraft Username:</b> ${data.mcname}</p>
 <p><b>Discord Username:</b> ${data.discord}</p>
 <p><b>Timezone:</b> ${data.timezone}</p>
@@ -155,6 +153,8 @@ div.innerHTML = `
 <p><b>Why are you interested in becoming a Staff Member:</b><br>${data.interest}</p>
 
 <p><b>Do you accept to follow and uphold all rules:</b> ${data.rulesAccepted}</p>
+
+<textarea class="notes" placeholder="Staff notes...">${data.notes || ""}</textarea>
 
 <button class="approve">Approve</button>
 <button class="deny">Deny</button>
