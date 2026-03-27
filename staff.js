@@ -175,6 +175,11 @@ status:"approved",
 acknowledged:false
 });
 
+/* 🔥 AUTO PROMOTE */
+await updateDoc(doc(db,"users",data.uid),{
+role: data.rank
+});
+
 await logAction(`${auth.currentUser.displayName} approved ${data.name}'s application`);
 
 };
