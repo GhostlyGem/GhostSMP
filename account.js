@@ -15,6 +15,9 @@ getDoc
 
 /* Firebase */
 
+const params = new URLSearchParams(window.location.search);
+const profileUid = params.get("uid");
+
 const firebaseConfig = {
 
 apiKey: "AIzaSyC9bCU2pRu0VGi0chBDdupYPSo5FxPSimo",
