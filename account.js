@@ -35,6 +35,10 @@ const db = getFirestore(app);
 
 /* Page Elements */
 
+document.getElementById("profile-name").innerText = userData.name;
+document.getElementById("profile-head").src =
+  "https://mc-heads.net/avatar/" + (userData.mcUsername || "Steve");
+
 const displayNameInput = document.getElementById("display-name");
 const saveNameBtn = document.getElementById("save-name");
 
