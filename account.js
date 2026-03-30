@@ -94,7 +94,7 @@ alert("Name updated!");
 
 /* Load user document */
 
-const userDoc = await getDoc(doc(db,"users",user.uid));
+const userDoc = await getDoc(doc(db,"users",targetUid));
 
 if(!userDoc.exists()) return;
 
