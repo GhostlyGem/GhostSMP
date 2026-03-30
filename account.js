@@ -154,3 +154,27 @@ window.location.href="/staff.html";
 };
 
 }
+
+const userData = userDoc.data();
+const isOwnProfile = viewingOwnProfile;
+
+/* If viewing someone else → disable editing */
+
+if(!isOwnProfile){
+
+displayNameInput.value = userData.name || "Unknown";
+displayNameInput.disabled = true;
+saveNameBtn.style.display = "none";
+
+mcInput.value = userData.mcUsername || "";
+mcInput.disabled = true;
+saveMcBtn.style.display = "none";
+
+/* Hide staff panel */
+staffArea.style.display = "none";
+
+}else{
+
+displayNameInput.value = user.displayName || "";
+
+}
