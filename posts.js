@@ -1,18 +1,19 @@
 import { db, auth } from "./firebase.js";
 import {
   collection, addDoc, serverTimestamp,
-  onSnapshot, query, orderBy
+  onSnapshot, query, orderBy,
+  getDoc, doc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 let currentUserData = null;
 
-// You likely already have this somewhere—reuse it if so
+/* Get user data */
 async function getUserData(uid) {
   const docSnap = await getDoc(doc(db, "users", uid));
   return docSnap.exists() ? docSnap.data() : null;
 }
 
-// Load user
+/* Load user */
 auth.onAuthStateChanged(async (user) => {
   if (!user) return;
 
@@ -20,53 +21,90 @@ auth.onAuthStateChanged(async (user) => {
   loadPosts();
 });
 
+/* Create post */
 window.submitPost = async () => {
-  if (!currentUserData) return;
+  if (!currentUserData) {
+    alert("User data not loaded yet");
+    return;
+  }
 
   const allowed = ["Owner","Head Admin","Admin","Manager","Mod"];
   if (!allowed.includes(currentUserData.role)) {
     return alert("No permission");
   }
 
-  const title = document.getElementById("postTitle").value;
-  const content = document.getElementById("postContent").value;
+  const title = document.getElementById("postTitle").value.trim();
+  const content = document.getElementById("postContent").value.trim();
 
-  await addDoc(collection(db, "posts"), {
-    title,
-    content,
-    authorId: auth.currentUser.uid,
-    authorName: currentUserData.username,
-    authorRank: currentUserData.role,
-    createdAt: serverTimestamp(),
-    pinned: false,
-    likeCount: 0
-  });
+  if (!title || !content) {
+    alert("Fill out all fields");
+    return;
+  }
+
+  try {
+    await addDoc(collection(db, "posts"), {
+      title,
+      content,
+      authorId: auth.currentUser.uid,
+      authorName: currentUserData.name || "Unknown",
+      authorRank: currentUserData.role,
+      mcUsername: currentUserData.mcUsername || "Steve", // ✅ FIX
+      createdAt: serverTimestamp(),
+      pinned: false,
+      likeCount: 0
+    });
+
+    // Clear inputs after posting
+    document.getElementById("postTitle").value = "";
+    document.getElementById("postContent").value = "";
+
+  } catch (err) {
+    console.error("Error creating post:", err);
+    alert("Error posting. Check console.");
+  }
 };
 
+/* Load posts */
 function loadPosts() {
-  const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+  const q = query(
+    collection(db, "posts"),
+    orderBy("createdAt", "desc")
+  );
 
   onSnapshot(q, (snapshot) => {
     const container = document.getElementById("posts");
+    if (!container) return;
+
     container.innerHTML = "";
 
-    snapshot.forEach(doc => {
-      const post = doc.data();
+    snapshot.forEach(docSnap => {
+      const post = docSnap.data();
+
+      // 🔥 IMPORTANT FIX: skip posts without timestamp
+      if (!post.createdAt) return;
 
       container.innerHTML += `
         <div class="post">
           <h2>${post.title}</h2>
           <p>${post.content}</p>
-          <small onclick="goToProfile('${post.authorId}')"
-                 style="cursor:pointer;">
-            ${post.authorName} (${post.authorRank})
-          </small>
+
+          <div style="display:flex; align-items:center; gap:6px;">
+            <img src="https://mc-heads.net/avatar/${post.mcUsername || "Steve"}" width="24">
+
+            <small onclick="goToProfile('${post.authorId}')"
+                   style="cursor:pointer;">
+              ${post.authorName} (${post.authorRank})
+            </small>
+          </div>
         </div>
       `;
     });
+  }, (error) => {
+    console.error("Post listener error:", error);
   });
 }
 
+/* Profile redirect */
 window.goToProfile = (authorId) => {
   window.location.href = `/account.html?uid=${authorId}`;
 };
