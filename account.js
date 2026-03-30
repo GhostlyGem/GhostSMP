@@ -178,3 +178,14 @@ staffArea.style.display = "none";
 displayNameInput.value = user.displayName || "";
 
 }
+
+const statsEl = document.getElementById("stats");
+
+if(statsEl){
+const kills = userData.kills || 0;
+const deaths = userData.deaths || 0;
+
+const kd = deaths === 0 ? kills : (kills / deaths).toFixed(2);
+
+statsEl.innerText = `K: ${kills} | D: ${deaths} | KD: ${kd}`;
+}
