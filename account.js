@@ -63,6 +63,9 @@ onAuthStateChanged(auth, async (user)=>{
 
 if(!user) return;
 
+const viewingOwnProfile = !profileUid || profileUid === user.uid;
+const targetUid = viewingOwnProfile ? user.uid : profileUid;
+
 /* Load display name */
 
 displayNameInput.value = user.displayName || "";
