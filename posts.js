@@ -2,7 +2,7 @@ import { db, auth } from "./firebase.js";
 import {
   collection, addDoc, serverTimestamp,
   onSnapshot, query, orderBy
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 let currentUserData = null;
 
