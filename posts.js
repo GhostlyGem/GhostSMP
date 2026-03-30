@@ -67,6 +67,6 @@ function loadPosts() {
   });
 }
 
-window.goToProfile = (uid) => {
-  window.location.href = `/profile.html?uid=${uid}`;
+window.goToProfile = (authorId) => {
+  window.location.href = `/account.html?uid=${authorId}`;
 };
