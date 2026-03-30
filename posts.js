@@ -28,7 +28,7 @@ window.submitPost = async () => {
     return;
   }
 
-  const allowed = ["Owner","Head Admin","Admin","Manager","Mod"];
+  const allowed = ["Owner","Head Admin","Admin","Manager","Mod","Event Manager"];
   if (!allowed.includes(currentUserData.role)) {
     return alert("No permission");
   }
