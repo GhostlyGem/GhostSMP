@@ -64,22 +64,14 @@ if(!status || !players) return;
 
 try{
 
-const controller = new AbortController();
-const timeout = setTimeout(()=>controller.abort(),5000);
-
-const res = await fetch(
-"https://api.mcsrvstat.us/2/mc.ghostsurvival.net",
-{signal:controller.signal}
-);
-
-clearTimeout(timeout);
-
+const res = await fetch("https://api.mcsrvstat.us/2/mc.ghostsurvival.net");
 const data = await res.json();
 
-if(data.online){
+/* ✅ FIX: better detection */
+if(data && data.online === true){
 
 status.innerHTML="Status: 🟢 Online";
-players.innerHTML="Players: "+data.players.online+" / "+data.players.max;
+players.innerHTML="Players: "+(data.players?.online || 0)+" / "+(data.players?.max || "?");
 
 }else{
 
@@ -92,14 +84,12 @@ players.innerHTML="Players: 0";
 
 console.error("Server status failed:",err);
 
-status.innerHTML="Status: ⚠ Unable to reach server";
+status.innerHTML="Status: ⚠ Error";
 players.innerHTML="Players: ?";
 
 }
 
 }
-
-loadServerStatus();
 
 /* ---------------- Players On Website ---------------- */
 
