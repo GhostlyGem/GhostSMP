@@ -93,6 +93,8 @@ players.innerHTML = "Players: ?";
 }
 
 }
+
+loadServerStatus();
 /* ---------------- Players On Website ---------------- */
 
 const playersCount = document.getElementById("website-players-count");
