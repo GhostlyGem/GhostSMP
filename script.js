@@ -119,6 +119,8 @@ playersCount.innerText="Players on Website ("+count+")";
 
 }
 
+/* ---------------- Staff List ---------------- */
+
 const staffList = document.getElementById("staff-list");
 
 if(staffList){
@@ -139,21 +141,23 @@ onSnapshot(usersRef,(snapshot)=>{
 
 staffList.innerHTML="";
 
-snapshot.forEach((doc)=>{
+snapshot.forEach((docSnap)=>{
 
-const data = doc.data();
+const data = docSnap.data();
 
 if(!staffRoles.includes(data.role)) return;
 
 const div = document.createElement("div");
-
 div.className="staff-card";
 
-div.innerHTML = `
-const mcName = data.mcUsername || data.name;
+/* ✅ FIXED MC NAME */
+const mcName = data.mcUsername && data.mcUsername.length > 0
+  ? data.mcUsername
+  : "Steve";
 
+div.innerHTML = `
 <img src="https://mc-heads.net/avatar/${mcName}/64">
-<p>${data.name}</p>
+<p>${data.name || "Unknown"}</p>
 <span>${data.role}</span>
 `;
 
@@ -180,16 +184,16 @@ where("uid","==",user.uid)
 
 onSnapshot(q,(snapshot)=>{
 
-snapshot.forEach((doc)=>{
+snapshot.forEach((docSnap)=>{
 
-const data = doc.data();
+const data = docSnap.data();
 
 if(data.status==="approved" && !data.acknowledged){
-showApprovalPopup(doc.id);
+showApprovalPopup(docSnap.id);
 }
 
 if(data.status==="denied" && !data.acknowledged){
-showDeniedPopup(doc.id);
+showDeniedPopup(docSnap.id);
 }
 
 });
