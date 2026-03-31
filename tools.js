@@ -10,7 +10,7 @@ async function generateRules() {
   output.textContent = "Generating rules...";
 
   try {
-    const response = await fetch("PASTE-YOUR-WORKER-URL-HERE", {
+    const response = await fetch("https://ghostsurvival-api.prestonclement566.workers.dev", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
