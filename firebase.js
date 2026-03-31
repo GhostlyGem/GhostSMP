@@ -3,7 +3,7 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-aut
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "YOUR_KEY",
+  apiKey: "AIzaSyC9bCU2pRu0VGi0chBDdupYPSo5FxPSimo",
   authDomain: "ghostsmp-bf0a3.firebaseapp.com",
   projectId: "ghostsmp-bf0a3",
   storageBucket: "ghostsmp-bf0a3.firebasestorage.app",
