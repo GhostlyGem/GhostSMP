@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Ghost Tools</title>
+  <title>Server Tools | GhostSMP</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<h1>Server Rules Generator</h1>
+<div class="tools-container">
+  <div class="tool-card">
+    <h1 class="tools-title">Server Rules Generator</h1>
+    <p class="tools-subtitle">Describe your Minecraft server and generate a starter rules list.</p>
 
-<textarea id="input" placeholder="Describe your server..."></textarea>
-<button onclick="generateRules()">Generate</button>
+    <textarea id="input" placeholder="Example: Survival server with PvP in arenas only, no griefing, family-friendly chat..."></textarea>
+    <button onclick="generateRules()">Generate Rules</button>
 
-<pre id="output"></pre>
-
+    <div id="output">Your generated rules will appear here.</div>
+  </div>
+</div>
 <script src="js/tools.js"></script>
 </body>
 </html>
