@@ -1,12 +1,6 @@
-console.log("tools.js loaded");
-
 async function generateRules() {
-  console.log("generateRules clicked");
-
   const input = document.getElementById("input").value.trim();
   const output = document.getElementById("output");
-
-  output.textContent = "Button clicked.";
 
   if (!input) {
     output.textContent = "Please describe your server first.";
@@ -26,10 +20,8 @@ async function generateRules() {
       })
     });
 
-    console.log("Response received:", response);
-
     const data = await response.json();
-    console.log("JSON data:", data);
+    console.log("Worker response:", data);
 
     if (!response.ok) {
       output.textContent = data.error || "Something went wrong.";
@@ -38,7 +30,7 @@ async function generateRules() {
 
     output.textContent = data.result;
   } catch (error) {
-    console.error("Fetch failed:", error);
+    console.error(error);
     output.textContent = "Failed to connect to the AI server.";
   }
 }
