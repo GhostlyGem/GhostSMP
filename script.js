@@ -62,35 +62,39 @@ const players = document.getElementById("players");
 
 if(!status || !players) return;
 
+status.innerHTML = "Status: Checking...";
+
 try{
 
 const res = await fetch("https://api.mcsrvstat.us/2/mc.ghostsurvival.net");
 const data = await res.json();
 
-/* ✅ FIX: better detection */
-if(data && data.online === true){
+console.log("Server API:", data); // 🔍 debug
 
-status.innerHTML="Status: 🟢 Online";
-players.innerHTML="Players: "+(data.players?.online || 0)+" / "+(data.players?.max || "?");
+if(data && data.online){
+
+status.innerHTML = "Status: 🟢 Online";
+players.innerHTML = "Players: " + (data.players?.online ?? 0) + " / " + (data.players?.max ?? "?");
 
 }else{
 
-status.innerHTML="Status: 🔴 Offline";
-players.innerHTML="Players: 0";
+status.innerHTML = "Status: 🔴 Offline";
+players.innerHTML = "Players: 0";
 
 }
 
 }catch(err){
 
-console.error("Server status failed:",err);
+console.error("Server status failed:", err);
 
-status.innerHTML="Status: ⚠ Error";
-players.innerHTML="Players: ?";
-
-}
+status.innerHTML = "Status: ⚠ Error";
+players.innerHTML = "Players: ?";
 
 }
 
+}
+
+loadServerStatus();
 /* ---------------- Players On Website ---------------- */
 
 const playersCount = document.getElementById("website-players-count");
