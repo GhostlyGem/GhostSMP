@@ -95,6 +95,7 @@ players.innerHTML = "Players: ?";
 }
 
 loadServerStatus();
+setInterval(loadServerStatus, 30000);
 /* ---------------- Players On Website ---------------- */
 
 const playersCount = document.getElementById("website-players-count");
