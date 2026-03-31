@@ -55,43 +55,51 @@ popup.style.textAlign="center";
 
 /* ---------------- Minecraft Server Status ---------------- */
 
-async function loadServerStatus(){
+/* ---------------- Minecraft Server Status ---------------- */
 
-const status = document.getElementById("status");
-const players = document.getElementById("players");
+async function loadServerStatus() {
+  const status = document.getElementById("status");
+  const players = document.getElementById("players");
 
-if(!status || !players) return;
+  if (!status || !players) return;
 
-status.innerHTML = "Status: Checking...";
+  status.textContent = "Status: Checking...";
+  players.textContent = "";
 
-try{
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
 
-const res = await fetch("https://api.mcsrvstat.us/2/mc.ghostsurvival.net");
-const data = await res.json();
+    const res = await fetch(
+      "https://api.mcsrvstat.us/2/mc.ghostsurvival.net",
+      { signal: controller.signal }
+    );
 
-console.log("Server API:", data); // 🔍 debug
+    clearTimeout(timeout);
 
-if(data && data.online){
+    if (!res.ok) {
+      throw new Error("HTTP " + res.status);
+    }
 
-status.innerHTML = "Status: 🟢 Online";
-players.innerHTML = "Players: " + (data.players?.online ?? 0) + " / " + (data.players?.max ?? "?");
+    const data = await res.json();
+    console.log("Server API response:", data);
 
-}else{
-
-status.innerHTML = "Status: 🔴 Offline";
-players.innerHTML = "Players: 0";
-
-}
-
-}catch(err){
-
-console.error("Server status failed:", err);
-
-status.innerHTML = "Status: ⚠ Error";
-players.innerHTML = "Players: ?";
-
-}
-
+    if (data && data.online === true) {
+      status.textContent = "Status: 🟢 Online";
+      players.textContent =
+        "Players: " +
+        (data.players?.online ?? 0) +
+        " / " +
+        (data.players?.max ?? "?");
+    } else {
+      status.textContent = "Status: 🔴 Offline";
+      players.textContent = "Players: 0";
+    }
+  } catch (err) {
+    console.error("Server status failed:", err);
+    status.textContent = "Status: ⚠ Error";
+    players.textContent = "Players: ?";
+  }
 }
 
 loadServerStatus();
