@@ -146,9 +146,11 @@ const mcName = data.mcUsername && data.mcUsername.length > 0
   : "Steve";
 
 div.innerHTML = `
-<img src="https://mc-heads.net/avatar/${mcName}/64">
-<p>${data.name || "Unknown"}</p>
-<span>${data.role}</span>
+<img 
+  src="https://mc-heads.net/avatar/${mcName}/32"
+  title="${data.name} (${data.role})"
+  style="cursor:pointer; border-radius:4px;"
+>
 `;
 
 staffList.appendChild(div);
