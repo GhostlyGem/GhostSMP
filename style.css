@@ -332,11 +332,10 @@ vertical-align:middle;
 margin-right:10px;
 }
 
-#staff-list{
-display:flex;
-flex-wrap:wrap;
-gap:20px;
-margin-top:15px;
+#staff-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .staff-card{
