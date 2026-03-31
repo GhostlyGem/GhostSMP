@@ -149,7 +149,7 @@ div.innerHTML = `
 <img 
   src="https://mc-heads.net/avatar/${mcName}/32"
   title="${data.name} (${data.role})"
-  style="cursor:pointer; border-radius:4px;"
+  style="width:32px; height:32px; object-fit:cover; border-radius:4px; cursor:pointer;"
 >
 `;
 
