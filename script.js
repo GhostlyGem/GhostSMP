@@ -71,7 +71,7 @@ async function loadServerStatus() {
     const timeout = setTimeout(() => controller.abort(), 5000);
 
     const res = await fetch(
-      "https://api.mcsrvstat.us/2/mc.ghostsurvival.net",
+      "https://api.mcsrvstat.us/3/mc.ghostsurvival.net",
       { signal: controller.signal }
     );
 
