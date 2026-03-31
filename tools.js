@@ -1,3 +1,6 @@
+console.log("tools.js loaded");
+alert("tools.js loaded");
+
 async function generateRules() {
   const input = document.getElementById("input").value.trim();
   const output = document.getElementById("output");
