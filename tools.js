@@ -121,3 +121,14 @@ async function generateRules() {
     console.error(error);
   }
 }
+
+
+function updateUsageDisplay() {
+  const usageInfo = document.getElementById("usage-info");
+  if (!usageInfo) return;
+
+  const remaining = getRemainingUses();
+  usageInfo.textContent = `Free plan: ${remaining} of ${WEEKLY_LIMIT} generations remaining this week.`;
+}
+
+updateUsageDisplay();
