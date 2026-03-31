@@ -338,6 +338,11 @@ margin-right:10px;
   gap: 6px;
 }
 
+#staff-list img {
+  width: 32px !important;
+  height: 32px !important;
+}
+
 .staff-card{
 background:#1e1e1e;
 padding:15px;
