@@ -253,8 +253,6 @@ function loadStaff(currentUserRole) {
       const uid = userDoc.id;
       const targetRole = data.role || "player";
       const targetIndex = rankOrder.indexOf(targetRole);
-      const currentUser = auth.currentUser;
-
       const div = document.createElement("div");
       div.className = "application";
 
