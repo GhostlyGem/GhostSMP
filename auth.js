@@ -66,13 +66,37 @@ function showLoggedOutUI(){
 
 }
 
+/* ---------------- Logout ---------------- */
+
+async function logout(user, logoutBtn){
+
+  if(logoutBtn) logoutBtn.disabled = true;
+
+  try{
+    if(user){
+      await deleteDoc(doc(db,"websiteOnline",user.uid));
+    }
+  }catch(error){
+    console.warn("Could not remove online status before logout:", error);
+  }
+
+  try{
+    await signOut(auth);
+  }catch(error){
+    console.error("Logout error:", error);
+    if(logoutBtn) logoutBtn.disabled = false;
+    alert("Could not log out. Please try again.");
+  }
+
+}
+
 /* ---------------- Logged In UI ---------------- */
 
 function showLoggedInUI(user){
 
   if(!authArea) return;
 
-  const headURL = `https://crafatar.com/avatars/${user.uid}?size=32&overlay`;
+  const headURL = `https://mc-heads.net/avatar/${user.uid}/32`;
 
   authArea.innerHTML = `
 <img src="${headURL}" class="user-avatar">
@@ -83,12 +107,8 @@ function showLoggedInUI(user){
   const logoutBtn = document.getElementById("logout-btn");
 
   if(logoutBtn){
-    logoutBtn.addEventListener("click", async ()=>{
-
-      await deleteDoc(doc(db,"websiteOnline",user.uid));
-
-      signOut(auth);
-
+    logoutBtn.addEventListener("click", ()=>{
+      logout(user, logoutBtn);
     });
   }
 
