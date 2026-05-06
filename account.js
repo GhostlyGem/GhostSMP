@@ -19,7 +19,7 @@ const profileUid = params.get("uid");
 
 /* Firebase */
 const firebaseConfig = {
-  apiKey: "YOUR_KEY",
+  apiKey: "AIzaSyC9bCU2pRu0VGi0chBDdupYPSo5FxPSimo",
   authDomain: "ghostsmp-bf0a3.firebaseapp.com",
   projectId: "ghostsmp-bf0a3",
   storageBucket: "ghostsmp-bf0a3.firebasestorage.app",
