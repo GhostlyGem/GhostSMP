@@ -1,29 +1,15 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { db, auth } from "./firebase.js";
+
 import {
-getFirestore,
-collection,
-onSnapshot,
-query,
-where,
-updateDoc,
-doc
+  collection,
+  onSnapshot,
+  query,
+  where,
+  updateDoc,
+  doc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-/* ---------------- Firebase Setup ---------------- */
-
-const firebaseConfig = {
-apiKey: "AIzaSyC9bCU2pRu0VGi0chBDdupYPSo5FxPSimo",
-authDomain: "ghostsmp-bf0a3.firebaseapp.com",
-projectId: "ghostsmp-bf0a3",
-storageBucket: "ghostsmp-bf0a3.firebasestorage.app",
-messagingSenderId: "415275850062",
-appId: "1:415275850062:web:c64aa3147dec2212a7661f"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 /* ---------------- Copy Server IP ---------------- */
 
@@ -55,8 +41,6 @@ popup.style.textAlign="center";
 
 /* ---------------- Minecraft Server Status ---------------- */
 
-/* ---------------- Minecraft Server Status ---------------- */
-
 async function loadServerStatus() {
   const status = document.getElementById("status");
   const players = document.getElementById("players");
@@ -85,25 +69,26 @@ async function loadServerStatus() {
     console.log("Server API response:", data);
 
     if (data && data.online === true) {
-      status.textContent = "Status: 🟢 Online";
+      status.textContent = "Status: Online";
       players.textContent =
         "Players: " +
         (data.players?.online ?? 0) +
         " / " +
         (data.players?.max ?? "?");
     } else {
-      status.textContent = "Status: 🔴 Offline";
+      status.textContent = "Status: Offline";
       players.textContent = "Players: 0";
     }
   } catch (err) {
     console.error("Server status failed:", err);
-    status.textContent = "Status: ⚠ Error";
+    status.textContent = "Status: Error";
     players.textContent = "Players: ?";
   }
 }
 
 loadServerStatus();
 setInterval(loadServerStatus, 30000);
+
 /* ---------------- Players On Website ---------------- */
 
 const playersCount = document.getElementById("website-players-count");
@@ -118,6 +103,8 @@ const count = snapshot.size;
 
 playersCount.innerText="Players on Website ("+count+")";
 
+}, (err)=>{
+console.error("Website player count failed:", err);
 });
 
 }
@@ -153,7 +140,6 @@ if(!staffRoles.includes(data.role)) return;
 const div = document.createElement("div");
 div.className="staff-card";
 
-/* ✅ FIXED MC NAME */
 const mcName = data.mcUsername && data.mcUsername.length > 0
   ? data.mcUsername
   : "Steve";
@@ -170,6 +156,8 @@ staffList.appendChild(div);
 
 });
 
+}, (err)=>{
+console.error("Staff list failed:", err);
 });
 
 }
@@ -203,6 +191,8 @@ showDeniedPopup(docSnap.id);
 
 });
 
+}, (err)=>{
+console.error("Application status listener failed:", err);
 });
 
 });
@@ -218,9 +208,9 @@ function showApprovalPopup(appId){
 const popup=document.createElement("div");
 
 popup.innerHTML=`
-<div style="font-size:30px;">✔️</div>
+<div style="font-size:30px;">Approved</div>
 <h3>Application Approved</h3>
-<button id="popup-ok">OK</button>
+<button id="popup-ok" type="button">OK</button>
 `;
 
 stylePopup(popup);
@@ -245,9 +235,9 @@ function showDeniedPopup(appId){
 const popup=document.createElement("div");
 
 popup.innerHTML=`
-<div style="font-size:30px;">❌</div>
+<div style="font-size:30px;">Denied</div>
 <h3>Application Denied</h3>
-<button id="popup-ok">OK</button>
+<button id="popup-ok" type="button">OK</button>
 `;
 
 stylePopup(popup);
