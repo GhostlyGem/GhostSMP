@@ -13,7 +13,8 @@ import {
 
 import {
   getAuth,
-  onAuthStateChanged
+  onAuthStateChanged,
+  signOut
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 /* Firebase */
@@ -38,6 +39,7 @@ const dashboard = document.getElementById("dashboard");
 const applicationsDiv = document.getElementById("applications");
 const staffList = document.getElementById("staff-list");
 const logsDiv = document.getElementById("staff-logs");
+const logoutBtn = document.getElementById("staff-logout-btn");
 
 /* Roles */
 
@@ -70,6 +72,32 @@ const rankOrder = [
 function setLoading(text) {
   if (loading) loading.textContent = text;
   console.log(text);
+}
+
+/* ---------------- Logout ---------------- */
+
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", async () => {
+    const user = auth.currentUser;
+    logoutBtn.disabled = true;
+
+    try {
+      if (user) {
+        await deleteDoc(doc(db, "websiteOnline", user.uid));
+      }
+    } catch (err) {
+      console.warn("Could not remove online status before logout:", err);
+    }
+
+    try {
+      await signOut(auth);
+      window.location.href = "/";
+    } catch (err) {
+      console.error("Logout failed:", err);
+      logoutBtn.disabled = false;
+      alert("Could not log out. Please try again.");
+    }
+  });
 }
 
 /* ---------------- Staff Log ---------------- */
@@ -131,7 +159,7 @@ onAuthStateChanged(auth, async (user) => {
     dashboard.style.display = "block";
 
     loadApplications(role);
-    loadStaff(role);
+    loadStaff(role, user.uid);
     loadLogs();
 
   } catch (err) {
@@ -241,7 +269,7 @@ function loadApplications(role) {
 
 /* ---------------- Staff Management ---------------- */
 
-function loadStaff(currentUserRole) {
+function loadStaff(currentUserRole, currentUserId) {
   const usersRef = collection(db, "users");
   const currentUserIndex = rankOrder.indexOf(currentUserRole);
 
@@ -275,7 +303,7 @@ function loadStaff(currentUserRole) {
         eraseBtn.disabled = true;
       }
 
-      if (currentUser && currentUser.uid === uid) {
+      if (currentUserId === uid) {
         demoteBtn.disabled = true;
         eraseBtn.disabled = true;
       }
@@ -311,7 +339,7 @@ function loadStaff(currentUserRole) {
             role: newRole
           });
 
-          await logAction(`${auth.currentUser.displayName} promoted ${data.name} → ${newRole}`);
+          await logAction(`${auth.currentUser.displayName} promoted ${data.name} to ${newRole}`);
         } catch (err) {
           console.error("Promote failed:", err);
           alert("Could not promote user.");
@@ -329,7 +357,7 @@ function loadStaff(currentUserRole) {
             role: newRole
           });
 
-          await logAction(`${auth.currentUser.displayName} demoted ${data.name} → ${newRole}`);
+          await logAction(`${auth.currentUser.displayName} demoted ${data.name} to ${newRole}`);
         } catch (err) {
           console.error("Demote failed:", err);
           alert("Could not demote user.");
