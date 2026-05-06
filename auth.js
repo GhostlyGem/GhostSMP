@@ -1,7 +1,6 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { auth, db } from "./firebase.js";
 
 import {
-  getAuth,
   GoogleAuthProvider,
   signInWithPopup,
   onAuthStateChanged,
@@ -9,28 +8,12 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 import {
-  getFirestore,
   doc,
   setDoc,
   getDoc,
   updateDoc,
   deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-/* ---------------- Firebase Setup ---------------- */
-
-const firebaseConfig = {
-  apiKey: "AIzaSyC9bCU2pRu0VGi0chBDdupYPSo5FxPSimo",
-  authDomain: "ghostsmp-bf0a3.firebaseapp.com",
-  projectId: "ghostsmp-bf0a3",
-  storageBucket: "ghostsmp-bf0a3.firebasestorage.app",
-  messagingSenderId: "415275850062",
-  appId: "1:415275850062:web:c64aa3147dec2212a7661f"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
 
 const provider = new GoogleAuthProvider();
 
@@ -54,8 +37,8 @@ function showLoggedOutUI(){
   if(!authArea) return;
 
   authArea.innerHTML = `
-    <button id="login-btn" class="login-btn">Login</button>
-    <button id="signup-btn" class="signup-btn">Sign Up</button>
+    <button id="login-btn" class="login-btn" type="button">Login</button>
+    <button id="signup-btn" class="signup-btn" type="button">Sign Up</button>
   `;
 
   const loginBtn = document.getElementById("login-btn");
@@ -68,27 +51,39 @@ function showLoggedOutUI(){
 
 /* ---------------- Logout ---------------- */
 
-async function logout(user, logoutBtn){
+async function logout(logoutBtn){
+
+  const user = auth.currentUser;
 
   if(logoutBtn) logoutBtn.disabled = true;
 
   try{
-    if(user){
-      await deleteDoc(doc(db,"websiteOnline",user.uid));
-    }
-  }catch(error){
-    console.warn("Could not remove online status before logout:", error);
-  }
-
-  try{
     await signOut(auth);
+    showLoggedOutUI();
   }catch(error){
     console.error("Logout error:", error);
     if(logoutBtn) logoutBtn.disabled = false;
     alert("Could not log out. Please try again.");
+    return;
+  }
+
+  if(user){
+    deleteDoc(doc(db,"websiteOnline",user.uid))
+      .catch((error)=>{
+        console.warn("Could not remove online status after logout:", error);
+      });
   }
 
 }
+
+document.addEventListener("click", (event)=>{
+  const logoutBtn = event.target.closest("#logout-btn");
+
+  if(!logoutBtn) return;
+
+  event.preventDefault();
+  logout(logoutBtn);
+});
 
 /* ---------------- Logged In UI ---------------- */
 
@@ -101,16 +96,8 @@ function showLoggedInUI(user){
   authArea.innerHTML = `
 <img src="${headURL}" class="user-avatar">
 <a href="account.html" class="user-name">${user.displayName}</a>
-<button id="logout-btn" class="login-btn">Logout</button>
+<button id="logout-btn" class="login-btn" type="button">Logout</button>
 `;
-
-  const logoutBtn = document.getElementById("logout-btn");
-
-  if(logoutBtn){
-    logoutBtn.addEventListener("click", ()=>{
-      logout(user, logoutBtn);
-    });
-  }
 
 }
 
