@@ -82,20 +82,20 @@ if (logoutBtn) {
     logoutBtn.disabled = true;
 
     try {
-      if (user) {
-        await deleteDoc(doc(db, "websiteOnline", user.uid));
-      }
-    } catch (err) {
-      console.warn("Could not remove online status before logout:", err);
-    }
-
-    try {
       await signOut(auth);
       window.location.href = "/";
     } catch (err) {
       console.error("Logout failed:", err);
       logoutBtn.disabled = false;
       alert("Could not log out. Please try again.");
+      return;
+    }
+
+    if (user) {
+      deleteDoc(doc(db, "websiteOnline", user.uid))
+        .catch((err) => {
+          console.warn("Could not remove online status after logout:", err);
+        });
     }
   });
 }
