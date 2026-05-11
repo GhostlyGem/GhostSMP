@@ -6,8 +6,6 @@ import {
   doc,
   getDoc,
   onSnapshot,
-  orderBy,
-  query,
   serverTimestamp,
   setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -25,6 +23,7 @@ const list = document.getElementById("pvp-rank-list");
 
 let canEditPvp = false;
 let currentStaffName = "Unknown Staff";
+let rankingsLoaded = false;
 
 function avatarUrl(username, size = 40){
   const name = username && username.trim() ? username.trim() : "MHF_Steve";
@@ -64,7 +63,12 @@ function renderPlayer(docSnap){
       const confirmed = confirm(`Remove ${username} from the PvP rankings?`);
       if (!confirmed) return;
 
-      await deleteDoc(doc(db, "pvpRankings", docSnap.id));
+      try {
+        await deleteDoc(doc(db, "pvpRankings", docSnap.id));
+      } catch (err) {
+        console.error("Could not remove PvP ranking:", err);
+        alert("Could not remove PvP ranking. Check Firestore rules.");
+      }
     });
   }
 
@@ -72,12 +76,10 @@ function renderPlayer(docSnap){
 }
 
 function loadPvpRankings(){
-  const rankingsQuery = query(
-    collection(db, "pvpRankings"),
-    orderBy("position", "asc")
-  );
+  if (rankingsLoaded) return;
+  rankingsLoaded = true;
 
-  onSnapshot(rankingsQuery, (snapshot) => {
+  onSnapshot(collection(db, "pvpRankings"), (snapshot) => {
     if (!list) return;
 
     list.innerHTML = "";
@@ -87,12 +89,21 @@ function loadPvpRankings(){
       return;
     }
 
-    snapshot.forEach((docSnap) => {
-      list.appendChild(renderPlayer(docSnap));
-    });
+    snapshot.docs
+      .sort((a, b) => Number(a.data().position || 9999) - Number(b.data().position || 9999))
+      .forEach((docSnap) => {
+        list.appendChild(renderPlayer(docSnap));
+      });
   }, (err) => {
     console.error("PvP rankings listener failed:", err);
-    if (list) list.innerHTML = '<div class="application">Could not load PvP rankings.</div>';
+
+    if (list) {
+      const message = err.code === "permission-denied"
+        ? "PvP rankings are blocked by Firestore rules."
+        : "Could not load PvP rankings.";
+
+      list.innerHTML = `<div class="application">${message}</div>`;
+    }
   });
 }
 
@@ -114,15 +125,20 @@ if (form) {
       return;
     }
 
-    await setDoc(doc(db, "pvpRankings", docIdForPosition(position)), {
-      username,
-      position,
-      level,
-      updatedAt: serverTimestamp(),
-      updatedBy: currentStaffName
-    });
+    try {
+      await setDoc(doc(db, "pvpRankings", docIdForPosition(position)), {
+        username,
+        position,
+        level,
+        updatedAt: serverTimestamp(),
+        updatedBy: currentStaffName
+      });
 
-    form.reset();
+      form.reset();
+    } catch (err) {
+      console.error("Could not save PvP ranking:", err);
+      alert("Could not save PvP ranking. Check Firestore rules.");
+    }
   });
 }
 
