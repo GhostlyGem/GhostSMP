@@ -2,9 +2,7 @@ import { db } from "./firebase.js";
 
 import {
   collection,
-  onSnapshot,
-  orderBy,
-  query
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const tableBody = document.getElementById("pvp-rankings-body");
@@ -14,12 +12,12 @@ function avatarUrl(username, size = 40){
   return `https://minotar.net/avatar/${encodeURIComponent(name)}/${size}.png`;
 }
 
-function renderRankings(snapshot){
+function renderRows(docs){
   if (!tableBody) return;
 
   tableBody.innerHTML = "";
 
-  if (snapshot.empty) {
+  if (!docs.length) {
     tableBody.innerHTML = `
       <tr>
         <td colspan="3">No PvP rankings have been added yet.</td>
@@ -28,38 +26,41 @@ function renderRankings(snapshot){
     return;
   }
 
-  snapshot.forEach((docSnap) => {
-    const data = docSnap.data();
-    const username = data.username || "Unknown";
-    const position = data.position || "?";
-    const level = data.level || "Unranked";
+  docs
+    .map((docSnap) => docSnap.data())
+    .sort((a, b) => Number(a.position || 9999) - Number(b.position || 9999))
+    .forEach((data) => {
+      const username = data.username || "Unknown";
+      const position = data.position || "?";
+      const level = data.level || "Unranked";
 
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>#${position}</td>
-      <td>
-        <img src="${avatarUrl(username)}" alt="${username} Minecraft head" width="40" height="40">
-        ${username}
-      </td>
-      <td>${level}</td>
-    `;
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>#${position}</td>
+        <td>
+          <img src="${avatarUrl(username)}" alt="${username} Minecraft head" width="40" height="40">
+          ${username}
+        </td>
+        <td>${level}</td>
+      `;
 
-    tableBody.appendChild(row);
-  });
+      tableBody.appendChild(row);
+    });
 }
 
-const rankingsQuery = query(
-  collection(db, "pvpRankings"),
-  orderBy("position", "asc")
-);
-
-onSnapshot(rankingsQuery, renderRankings, (err) => {
+onSnapshot(collection(db, "pvpRankings"), (snapshot) => {
+  renderRows(snapshot.docs);
+}, (err) => {
   console.error("PvP rankings failed to load:", err);
 
   if (tableBody) {
+    const message = err.code === "permission-denied"
+      ? "PvP rankings are blocked by Firestore rules."
+      : "Could not load PvP rankings.";
+
     tableBody.innerHTML = `
       <tr>
-        <td colspan="3">Could not load PvP rankings.</td>
+        <td colspan="3">${message}</td>
       </tr>
     `;
   }
