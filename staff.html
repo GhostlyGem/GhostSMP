@@ -68,7 +68,8 @@ color:white;
 }
 
 .deny,
-#staff-logout-btn{
+#staff-logout-btn,
+.remove-pvp-player{
 background:#e74c3c;
 color:white;
 }
@@ -83,12 +84,59 @@ opacity:.5;
 cursor:not-allowed;
 }
 
+.staff-form{
+display:grid;
+grid-template-columns:repeat(3,minmax(140px,1fr));
+gap:12px;
+max-width:720px;
+}
+
+.staff-form input{
+padding:10px;
+border:none;
+border-radius:6px;
+font:inherit;
+}
+
+.staff-form button{
+justify-self:start;
+}
+
+.pvp-player{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:12px;
+}
+
+.pvp-player-info{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.pvp-player img{
+width:40px;
+height:40px;
+border-radius:4px;
+image-rendering:pixelated;
+}
+
 @media (max-width: 700px){
 body{
 padding:20px;
 }
 
 .topbar{
+align-items:flex-start;
+flex-direction:column;
+}
+
+.staff-form{
+grid-template-columns:1fr;
+}
+
+.pvp-player{
 align-items:flex-start;
 flex-direction:column;
 }
@@ -111,6 +159,21 @@ flex-direction:column;
 <p id="loading">Checking if you are a Staff Member...</p>
 
 <div id="dashboard" style="display:none;">
+
+<div class="section" id="pvp-editor-section" style="display:none;">
+
+<h2>PvP Rankings</h2>
+
+<form id="pvp-rank-form" class="staff-form">
+<input id="pvp-username" type="text" placeholder="Minecraft username" required>
+<input id="pvp-position" type="number" min="1" step="1" placeholder="Rank position" required>
+<input id="pvp-level" type="text" placeholder="Level, ex: LT 3 or HT 1" required>
+<button class="approve" type="submit">Save PvP Rank</button>
+</form>
+
+<div id="pvp-rank-list"></div>
+
+</div>
 
 <div class="section">
 
@@ -137,6 +200,7 @@ flex-direction:column;
 </div>
 
 <script type="module" src="staff.js"></script>
+<script type="module" src="staff-pvp.js"></script>
 
 </body>
 </html>
