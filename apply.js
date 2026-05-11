@@ -25,7 +25,7 @@ function updateRoleOptions(settings = {}){
   Array.from(rankSelect.options).forEach((option)=>{
     if(!option.value) return;
 
-    const isOpen = settings[option.value] !== false;
+    const isOpen = settings[option.value] === true;
 
     option.textContent = `${option.value} (${isOpen ? "OPEN" : "CLOSED"})`;
     option.disabled = !isOpen;
@@ -123,7 +123,7 @@ async function submitApplication(e){
     const settingsDoc = await getDoc(doc(db,"settings","applications"));
     const latestSettings = settingsDoc.exists() ? settingsDoc.data() : applicationSettings;
 
-    if(latestSettings && latestSettings[data.rank] === false){
+    if(!latestSettings || latestSettings[data.rank] !== true){
       alert("This role is currently CLOSED.");
       return;
     }
