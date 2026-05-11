@@ -11,6 +11,11 @@ import {
 
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+function minecraftAvatarUrl(mcUsername, size = 32){
+  const name = mcUsername && mcUsername.trim() ? mcUsername.trim() : "MHF_Steve";
+  return `https://minotar.net/avatar/${encodeURIComponent(name)}/${size}.png`;
+}
+
 /* ---------------- Copy Server IP ---------------- */
 
 const ip = document.getElementById("ip");
@@ -142,12 +147,13 @@ div.className="staff-card";
 
 const mcName = data.mcUsername && data.mcUsername.length > 0
   ? data.mcUsername
-  : "Steve";
+  : "MHF_Steve";
 
 div.innerHTML = `
 <img 
-  src="https://mc-heads.net/avatar/${mcName}/32"
-  title="${data.name} (${data.role})"
+  src="${minecraftAvatarUrl(mcName, 32)}"
+  title="${data.name || "Staff"} (${data.role})"
+  alt="${mcName} Minecraft head"
   style="width:32px; height:32px; object-fit:cover; border-radius:4px; cursor:pointer;"
 >
 `;
