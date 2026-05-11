@@ -19,6 +19,11 @@ const provider = new GoogleAuthProvider();
 
 const authArea = document.getElementById("auth-area");
 
+function minecraftAvatarUrl(mcUsername, size = 32){
+  const name = mcUsername && mcUsername.trim() ? mcUsername.trim() : "MHF_Steve";
+  return `https://minotar.net/avatar/${encodeURIComponent(name)}/${size}.png`;
+}
+
 /* ---------------- Login ---------------- */
 
 function login(){
@@ -87,14 +92,14 @@ document.addEventListener("click", (event)=>{
 
 /* ---------------- Logged In UI ---------------- */
 
-function showLoggedInUI(user){
+function showLoggedInUI(user, userData){
 
   if(!authArea) return;
 
-  const headURL = `https://mc-heads.net/avatar/${user.uid}/32`;
+  const headURL = minecraftAvatarUrl(userData?.mcUsername, 32);
 
   authArea.innerHTML = `
-<img src="${headURL}" class="user-avatar">
+<img src="${headURL}" class="user-avatar" alt="Minecraft head">
 <a href="account.html" class="user-name">${user.displayName}</a>
 <button id="logout-btn" class="login-btn" type="button">Logout</button>
 `;
@@ -107,26 +112,23 @@ onAuthStateChanged(auth, async (user)=>{
 
   if(user){
 
+    let userData = {
+      name:user.displayName,
+      role:"player",
+      mcUsername:""
+    };
+
     try{
 
       const userRef = doc(db,"users",user.uid);
       const userSnap = await getDoc(userRef);
-
-      /* Track website online users */
-
-      await setDoc(doc(db,"websiteOnline",user.uid),{
-        name:user.displayName,
-        timestamp:Date.now()
-      });
 
       /* Create user ONLY if first login */
 
       if(!userSnap.exists()){
 
         await setDoc(userRef,{
-          name:user.displayName,
-          role:"player",
-          mcUsername:"",
+          ...userData,
           created:Date.now(),
           lastLogin:Date.now()
         });
@@ -134,6 +136,11 @@ onAuthStateChanged(auth, async (user)=>{
         console.log("New user created");
 
       }else{
+
+        userData = {
+          ...userData,
+          ...userSnap.data()
+        };
 
         /* Update login time but KEEP role */
 
@@ -143,6 +150,14 @@ onAuthStateChanged(auth, async (user)=>{
         });
 
       }
+
+      /* Track website online users */
+
+      await setDoc(doc(db,"websiteOnline",user.uid),{
+        name:user.displayName,
+        mcUsername:userData.mcUsername || "",
+        timestamp:Date.now()
+      });
 
       /* Remove user when tab closes */
 
@@ -156,7 +171,7 @@ onAuthStateChanged(auth, async (user)=>{
 
     }
 
-    showLoggedInUI(user);
+    showLoggedInUI(user, userData);
 
   }else{
 
