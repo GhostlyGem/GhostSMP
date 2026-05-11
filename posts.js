@@ -6,6 +6,11 @@ import {
   updateDoc, increment
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+function minecraftAvatarUrl(mcUsername, size = 24){
+  const name = mcUsername && mcUsername.trim() ? mcUsername.trim() : "MHF_Steve";
+  return `https://minotar.net/avatar/${encodeURIComponent(name)}/${size}.png`;
+}
+
 async function updateLikeCount(postId, change) {
   const postRef = doc(db, "posts", postId);
 
@@ -70,7 +75,7 @@ window.submitPost = async () => {
       authorId: auth.currentUser.uid,
       authorName: currentUserData.name || "Unknown",
       authorRank: currentUserData.role,
-      mcUsername: currentUserData.mcUsername || "Steve",
+      mcUsername: currentUserData.mcUsername || "",
       createdAt: serverTimestamp(),
       pinned: false,
       likeCount: 0
@@ -103,13 +108,15 @@ function loadPosts() {
 
       if (!post.createdAt) return;
 
+      const mcName = post.mcUsername || "MHF_Steve";
+
       container.innerHTML += `
         <div class="post">
           <h2>${post.title || "Untitled"}</h2>
           <p>${post.content || ""}</p>
 
           <div style="display:flex; align-items:center; gap:6px;">
-            <img src="https://mc-heads.net/avatar/${post.mcUsername || "Steve"}" width="24">
+            <img src="${minecraftAvatarUrl(mcName, 24)}" width="24" height="24" alt="${mcName} Minecraft head">
             <small onclick="goToProfile('${post.authorId}')" style="cursor:pointer;">
               ${post.authorName || "Unknown"} (${post.authorRank || "Player"})
             </small>
