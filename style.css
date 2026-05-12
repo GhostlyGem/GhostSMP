@@ -201,6 +201,21 @@ nav a:hover{
   margin-bottom:15px;
 }
 
+.meet-staff-btn{
+  display:block;
+  margin-top:18px;
+  padding:10px 12px;
+  background:#7cffb3;
+  color:black;
+  border-radius:6px;
+  text-decoration:none;
+  font-size:10px;
+}
+
+.meet-staff-btn:hover{
+  background:#5fe89c;
+}
+
 .player{
   display:flex;
   align-items:center;
@@ -236,11 +251,14 @@ nav a:hover{
   height:32px !important;
 }
 
-#staff-container{
-  display:flex;
-  flex-wrap:wrap;
-  gap:20px;
-  justify-content:center;
+#staff-container,
+.meet-staff-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:24px;
+  justify-items:center;
+  max-width:900px;
+  margin:40px auto 0;
 }
 
 .staff-card{
@@ -253,6 +271,26 @@ nav a:hover{
   width:32px !important;
   height:32px !important;
   border-radius:4px;
+}
+
+.meet-staff-card{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+}
+
+.meet-staff-card img{
+  width:96px;
+  height:96px;
+  border-radius:8px;
+  image-rendering:pixelated;
+}
+
+.meet-staff-name{
+  font-size:12px;
+  color:#7cffb3;
+  overflow-wrap:anywhere;
 }
 
 /* Tools page styles */
