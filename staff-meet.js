@@ -13,7 +13,15 @@ import {
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const editorRoles = ["Owner", "Head Admin", "Admin"];
-const allowedMeetRoles = ["Owner", "Head Admin", "Admin", "Manager", "Mod", "JrMod", "Event Manager"];
+const allowedMeetRoles = [
+  { role: "Owner", aliases: ["owner", "owners"] },
+  { role: "Head Admin", aliases: ["head admin", "head admins"] },
+  { role: "Admin", aliases: ["admin", "admins", "administrator", "administrators"] },
+  { role: "Manager", aliases: ["manager", "managers"] },
+  { role: "Mod", aliases: ["mod", "mods", "moderator", "moderators"] },
+  { role: "JrMod", aliases: ["jrmod", "jrmods", "jr mod", "jr mods", "junior mod", "junior mods"] },
+  { role: "Event Manager", aliases: ["event manager", "event managers"] }
+];
 
 const section = document.getElementById("meet-staff-editor-section");
 const form = document.getElementById("meet-staff-form");
@@ -26,14 +34,24 @@ let canEditMeetStaff = false;
 let currentStaffName = "Unknown Staff";
 let meetStaffLoaded = false;
 
+function cleanText(value){
+  return String(value || "").trim();
+}
+
 function avatarUrl(username, size = 40){
-  const name = username && username.trim() ? username.trim() : "MHF_Steve";
+  const name = cleanText(username) || "MHF_Steve";
+  return `https://mc-heads.net/avatar/${encodeURIComponent(name)}/${size}`;
+}
+
+function backupAvatarUrl(username, size = 40){
+  const name = cleanText(username) || "MHF_Steve";
   return `https://minotar.net/avatar/${encodeURIComponent(name)}/${size}.png`;
 }
 
 function normalizeRole(role){
-  const cleaned = role.trim().toLowerCase().replace(/\s+/g, " ");
-  return allowedMeetRoles.find((knownRole) => knownRole.toLowerCase() === cleaned) || "";
+  const cleaned = cleanText(role).toLowerCase().replace(/\s+/g, " ");
+  const match = allowedMeetRoles.find((knownRole) => knownRole.aliases.includes(cleaned));
+  return match ? match.role : "";
 }
 
 function docIdForUsername(username){
@@ -59,6 +77,13 @@ function renderStaffMember(docSnap){
     </div>
     <button class="remove-meet-staff" type="button">Remove</button>
   `;
+
+  const image = div.querySelector("img");
+  image.addEventListener("error", () => {
+    if (image.dataset.usedBackup === "true") return;
+    image.dataset.usedBackup = "true";
+    image.src = backupAvatarUrl(username);
+  });
 
   const removeBtn = div.querySelector(".remove-meet-staff");
 
