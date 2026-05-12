@@ -38,6 +38,10 @@ function cleanText(value){
   return String(value || "").trim();
 }
 
+function roleKey(value){
+  return cleanText(value).toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
 function avatarUrl(username, size = 40){
   const name = cleanText(username) || "MHF_Steve";
   return `https://mc-heads.net/avatar/${encodeURIComponent(name)}/${size}`;
@@ -49,8 +53,10 @@ function backupAvatarUrl(username, size = 40){
 }
 
 function normalizeRole(role){
-  const cleaned = cleanText(role).toLowerCase().replace(/\s+/g, " ");
-  const match = allowedMeetRoles.find((knownRole) => knownRole.aliases.includes(cleaned));
+  const key = roleKey(role);
+  const match = allowedMeetRoles.find((knownRole) => {
+    return knownRole.aliases.some((alias) => roleKey(alias) === key) || roleKey(knownRole.role) === key;
+  });
   return match ? match.role : "";
 }
 
