@@ -7,36 +7,71 @@ import {
 
 const grid = document.getElementById("meet-staff-grid");
 
+const roleGroups = [
+  { role: "Owner", title: "Owner", className: "owner" },
+  { role: "Head Admin", title: "Head Admins", className: "head-admin" },
+  { role: "Admin", title: "Admins", className: "admin" },
+  { role: "Manager", title: "Managers", className: "manager" },
+  { role: "Mod", title: "Mods", className: "mod" },
+  { role: "JrMod", title: "JrMods", className: "jrmod" },
+  { role: "Event Manager", title: "Event Managers", className: "event-manager" }
+];
+
 function avatarUrl(username, size = 96){
   const name = username && username.trim() ? username.trim() : "MHF_Steve";
   return `https://minotar.net/avatar/${encodeURIComponent(name)}/${size}.png`;
 }
 
+function renderStaffCard(staff){
+  const username = staff.username || "Unknown";
+  const card = document.createElement("div");
+  card.className = "meet-staff-card";
+
+  card.innerHTML = `
+    <img src="${avatarUrl(username)}" alt="${username} Minecraft head">
+    <div class="meet-staff-name">${username}</div>
+  `;
+
+  return card;
+}
+
 function renderStaff(docs){
   if (!grid) return;
 
+  const staffMembers = docs.map((docSnap) => docSnap.data());
+
   grid.innerHTML = "";
 
-  if (!docs.length) {
-    grid.innerHTML = '<div class="meet-staff-card">No staff members have been added yet.</div>';
+  if (!staffMembers.length) {
+    grid.innerHTML = '<div class="meet-staff-empty">No staff members have been added yet.</div>';
     return;
   }
 
-  docs
-    .map((docSnap) => docSnap.data())
-    .sort((a, b) => Number(a.position || 9999) - Number(b.position || 9999))
-    .forEach((staff) => {
-      const username = staff.username || "Unknown";
-      const card = document.createElement("div");
-      card.className = "meet-staff-card";
+  roleGroups.forEach((group) => {
+    const members = staffMembers
+      .filter((staff) => staff.role === group.role)
+      .sort((a, b) => Number(a.position || 9999) - Number(b.position || 9999));
 
-      card.innerHTML = `
-        <img src="${avatarUrl(username)}" alt="${username} Minecraft head">
-        <div class="meet-staff-name">${username}</div>
-      `;
+    const section = document.createElement("section");
+    section.className = `meet-staff-role-box ${group.className}`;
 
-      grid.appendChild(card);
-    });
+    section.innerHTML = `
+      <h2>${group.title}</h2>
+      <div class="meet-staff-role-members"></div>
+    `;
+
+    const membersContainer = section.querySelector(".meet-staff-role-members");
+
+    if (members.length) {
+      members.forEach((staff) => {
+        membersContainer.appendChild(renderStaffCard(staff));
+      });
+    } else {
+      membersContainer.innerHTML = '<div class="meet-staff-empty">No staff listed.</div>';
+    }
+
+    grid.appendChild(section);
+  });
 }
 
 onSnapshot(collection(db, "meetStaff"), (snapshot) => {
@@ -49,6 +84,6 @@ onSnapshot(collection(db, "meetStaff"), (snapshot) => {
       ? "Meet the Staff is blocked by Firestore rules."
       : "Could not load Meet the Staff.";
 
-    grid.innerHTML = `<div class="meet-staff-card">${message}</div>`;
+    grid.innerHTML = `<div class="meet-staff-empty">${message}</div>`;
   }
 });
