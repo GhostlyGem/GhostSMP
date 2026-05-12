@@ -5,9 +5,11 @@ import {
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
   onSnapshot,
   serverTimestamp,
-  setDoc
+  setDoc,
+  writeBatch
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -30,8 +32,41 @@ function avatarUrl(username, size = 40){
   return `https://minotar.net/avatar/${encodeURIComponent(name)}/${size}.png`;
 }
 
-function docIdForPosition(position){
-  return String(position).padStart(4, "0");
+function docIdForUsername(username){
+  return username.trim().toLowerCase().replace(/[^a-z0-9_]/g, "-");
+}
+
+function rankingData(docSnap){
+  return {
+    id: docSnap.id,
+    ref: docSnap.ref,
+    ...docSnap.data()
+  };
+}
+
+function nextPosition(rankings){
+  const positions = rankings
+    .map((ranking) => Number(ranking.position))
+    .filter((position) => Number.isInteger(position) && position > 0);
+
+  return positions.length ? Math.max(...positions) + 1 : 1;
+}
+
+function uniquePosition(startPosition, rankings, username){
+  const normalizedUsername = username.trim().toLowerCase();
+  const takenPositions = new Set(
+    rankings
+      .filter((ranking) => String(ranking.username || "").trim().toLowerCase() !== normalizedUsername)
+      .map((ranking) => Number(ranking.position))
+      .filter((position) => Number.isInteger(position) && position > 0)
+  );
+
+  let position = startPosition;
+  while (takenPositions.has(position)) {
+    position += 1;
+  }
+
+  return position;
 }
 
 function renderPlayer(docSnap){
@@ -117,22 +152,44 @@ if (form) {
     }
 
     const username = usernameInput.value.trim();
-    const position = Number(positionInput.value);
+    const requestedPosition = positionInput.value.trim() ? Number(positionInput.value) : null;
     const level = levelInput.value.trim().toUpperCase();
 
-    if (!username || !Number.isInteger(position) || position < 1 || !level) {
-      alert("Please enter a username, rank position, and level.");
+    if (!username || (requestedPosition !== null && (!Number.isInteger(requestedPosition) || requestedPosition < 1)) || !level) {
+      alert("Please enter a username, valid rank position if using one, and level.");
       return;
     }
 
     try {
-      await setDoc(doc(db, "pvpRankings", docIdForPosition(position)), {
+      const rankingsSnap = await getDocs(collection(db, "pvpRankings"));
+      const rankings = rankingsSnap.docs.map(rankingData);
+      const startPosition = requestedPosition || nextPosition(rankings);
+      const position = uniquePosition(startPosition, rankings, username);
+      const playerDoc = doc(db, "pvpRankings", docIdForUsername(username));
+      const batch = writeBatch(db);
+      const normalizedUsername = username.toLowerCase();
+
+      rankings
+        .filter((ranking) => String(ranking.username || "").trim().toLowerCase() === normalizedUsername)
+        .forEach((ranking) => {
+          if (ranking.id !== playerDoc.id) {
+            batch.delete(ranking.ref);
+          }
+        });
+
+      batch.set(playerDoc, {
         username,
         position,
         level,
         updatedAt: serverTimestamp(),
         updatedBy: currentStaffName
       });
+
+      await batch.commit();
+
+      if (requestedPosition && position !== requestedPosition) {
+        alert(`${username} was added at #${position} because #${requestedPosition} was already taken.`);
+      }
 
       form.reset();
     } catch (err) {
