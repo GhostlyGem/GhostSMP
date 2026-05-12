@@ -44,27 +44,47 @@ function renderStaffCard(staff){
 function renderRoleBox(group, members){
   const section = document.createElement("section");
   section.className = `meet-staff-role-box ${group.className}`;
+  section.dataset.role = group.role;
 
   section.innerHTML = `
     <h2>${group.title}</h2>
-    <div class="meet-staff-role-members"></div>
+    <div class="meet-staff-role-members" data-members="${group.role}"></div>
   `;
 
-  const membersContainer = section.querySelector(".meet-staff-role-members");
+  fillMembers(section.querySelector(".meet-staff-role-members"), members);
+  return section;
+}
 
-  if (members.length) {
-    members.forEach((staff) => {
-      membersContainer.appendChild(renderStaffCard(staff));
-    });
-  } else {
-    membersContainer.innerHTML = '<div class="meet-staff-empty">No staff listed.</div>';
+function fillMembers(container, members){
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  if (!members.length) {
+    container.innerHTML = '<div class="meet-staff-empty">No staff listed.</div>';
+    return;
   }
 
-  return section;
+  members.forEach((staff) => {
+    container.appendChild(renderStaffCard(staff));
+  });
+}
+
+function ensureRoleBoxes(){
+  if (!grid) return;
+
+  roleGroups.forEach((group) => {
+    const existingBox = grid.querySelector(`[data-role="${group.role}"]`);
+    if (!existingBox) {
+      grid.appendChild(renderRoleBox(group, []));
+    }
+  });
 }
 
 function renderStaff(docs){
   if (!grid) return;
+
+  ensureRoleBoxes();
 
   const staffMembers = docs.map((docSnap) => {
     const data = docSnap.data();
@@ -74,14 +94,12 @@ function renderStaff(docs){
     };
   });
 
-  grid.innerHTML = "";
-
   roleGroups.forEach((group) => {
     const members = staffMembers
       .filter((staff) => staff.role === group.role)
       .sort((a, b) => Number(a.position || 9999) - Number(b.position || 9999));
 
-    grid.appendChild(renderRoleBox(group, members));
+    fillMembers(grid.querySelector(`[data-members="${group.role}"]`), members);
   });
 }
 
@@ -91,12 +109,17 @@ onSnapshot(collection(db, "meetStaff"), (snapshot) => {
   renderStaff(snapshot.docs);
 }, (err) => {
   console.error("Meet the Staff failed to load:", err);
+  renderStaff([]);
 
   if (grid) {
     const message = err.code === "permission-denied"
       ? "Meet the Staff is blocked by Firestore rules."
       : "Could not load Meet the Staff.";
 
-    grid.innerHTML = `<div class="meet-staff-empty">${message}</div>`;
+    const firstBox = grid.querySelector(".meet-staff-role-members");
+    fillMembers(firstBox, []);
+    if (firstBox) {
+      firstBox.innerHTML = `<div class="meet-staff-empty">${message}</div>`;
+    }
   }
 });
