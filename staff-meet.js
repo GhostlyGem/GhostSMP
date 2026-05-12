@@ -13,10 +13,12 @@ import {
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const editorRoles = ["Owner", "Head Admin", "Admin"];
+const allowedMeetRoles = ["Owner", "Head Admin", "Admin", "Manager", "Mod", "JrMod", "Event Manager"];
 
 const section = document.getElementById("meet-staff-editor-section");
 const form = document.getElementById("meet-staff-form");
 const usernameInput = document.getElementById("meet-staff-username");
+const roleInput = document.getElementById("meet-staff-role");
 const positionInput = document.getElementById("meet-staff-position");
 const list = document.getElementById("meet-staff-list");
 
@@ -29,6 +31,11 @@ function avatarUrl(username, size = 40){
   return `https://minotar.net/avatar/${encodeURIComponent(name)}/${size}.png`;
 }
 
+function normalizeRole(role){
+  const cleaned = role.trim().toLowerCase().replace(/\s+/g, " ");
+  return allowedMeetRoles.find((knownRole) => knownRole.toLowerCase() === cleaned) || "";
+}
+
 function docIdForUsername(username){
   return username.trim().toLowerCase().replace(/[^a-z0-9_]/g, "-");
 }
@@ -36,6 +43,7 @@ function docIdForUsername(username){
 function renderStaffMember(docSnap){
   const data = docSnap.data();
   const username = data.username || "Unknown";
+  const role = data.role || "Unassigned";
   const position = Number(data.position || 9999);
 
   const div = document.createElement("div");
@@ -46,7 +54,7 @@ function renderStaffMember(docSnap){
       <img src="${avatarUrl(username)}" alt="${username} Minecraft head">
       <div>
         <b>${username}</b><br>
-        <span class="rank">Display order: ${position}</span>
+        <span class="rank">${role} | Display order: ${position}</span>
       </div>
     </div>
     <button class="remove-meet-staff" type="button">Remove</button>
@@ -115,16 +123,18 @@ if (form) {
     }
 
     const username = usernameInput.value.trim();
+    const role = normalizeRole(roleInput.value);
     const position = Number(positionInput.value);
 
-    if (!username || !Number.isInteger(position) || position < 1) {
-      alert("Please enter a Minecraft username and display order.");
+    if (!username || !role || !Number.isInteger(position) || position < 1) {
+      alert("Please enter a Minecraft username, valid role, and display order.");
       return;
     }
 
     try {
       await setDoc(doc(db, "meetStaff", docIdForUsername(username)), {
         username,
+        role,
         position,
         updatedAt: serverTimestamp(),
         updatedBy: currentStaffName
