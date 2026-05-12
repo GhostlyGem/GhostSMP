@@ -155,6 +155,7 @@ onAuthStateChanged(auth, async (user)=>{
 
       await setDoc(doc(db,"websiteOnline",user.uid),{
         name:user.displayName,
+        role:userData.role || "player",
         mcUsername:userData.mcUsername || "",
         timestamp:Date.now()
       });
