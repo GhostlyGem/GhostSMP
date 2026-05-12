@@ -17,6 +17,12 @@ const roleGroups = [
   { role: "Owner", title: "Owner", className: "owner", aliases: ["owner", "owners"] }
 ];
 
+const fallbackGroup = {
+  role: "Uncategorized",
+  title: "Needs Role Fix",
+  className: "uncategorized"
+};
+
 function cleanText(value){
   return String(value || "").trim();
 }
@@ -104,6 +110,13 @@ function ensureRoleBoxes(){
       grid.appendChild(renderRoleBox(group, []));
     }
   });
+
+  let fallbackBox = grid.querySelector(`[data-role="${fallbackGroup.role}"]`);
+  if (!fallbackBox) {
+    fallbackBox = renderRoleBox(fallbackGroup, []);
+    fallbackBox.style.display = "none";
+    grid.appendChild(fallbackBox);
+  }
 }
 
 function renderStaff(docs){
@@ -115,6 +128,7 @@ function renderStaff(docs){
     const data = docSnap.data();
     return {
       ...data,
+      id: docSnap.id,
       role: normalizeRole(data.role)
     };
   });
@@ -126,6 +140,17 @@ function renderStaff(docs){
 
     fillMembers(grid.querySelector(`[data-members="${group.role}"]`), members);
   });
+
+  const categorizedRoles = new Set(roleGroups.map((group) => group.role));
+  const fallbackMembers = staffMembers
+    .filter((staff) => !categorizedRoles.has(staff.role))
+    .sort((a, b) => Number(a.position || 9999) - Number(b.position || 9999));
+  const fallbackBox = grid.querySelector(`[data-role="${fallbackGroup.role}"]`);
+
+  if (fallbackBox) {
+    fallbackBox.style.display = fallbackMembers.length ? "block" : "none";
+    fillMembers(grid.querySelector(`[data-members="${fallbackGroup.role}"]`), fallbackMembers);
+  }
 }
 
 renderStaff([]);
