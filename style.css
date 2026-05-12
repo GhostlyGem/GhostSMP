@@ -83,7 +83,7 @@ nav a:hover{
 }
 
 .page{
-  max-width:900px;
+  max-width:1100px;
   margin:auto;
   text-align:center;
   padding:120px 40px;
@@ -251,8 +251,7 @@ nav a:hover{
   height:32px !important;
 }
 
-#staff-container,
-.meet-staff-grid{
+#staff-container{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
   gap:24px;
@@ -273,11 +272,70 @@ nav a:hover{
   border-radius:4px;
 }
 
+.meet-staff-grid{
+  display:flex;
+  flex-direction:column;
+  gap:28px;
+  max-width:1050px;
+  margin:40px auto 0;
+}
+
+.meet-staff-role-box{
+  border:3px solid rgba(255,255,255,0.25);
+  border-radius:8px;
+  background:rgba(255,255,255,0.04);
+  padding:24px;
+}
+
+.meet-staff-role-box h2{
+  margin:0 0 22px;
+  text-align:center;
+  font-size:16px;
+}
+
+.meet-staff-role-members{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:flex-start;
+  gap:22px;
+}
+
+.meet-staff-role-box.owner{
+  border-color:#00ffff;
+}
+
+.meet-staff-role-box.head-admin{
+  border-color:#7a0000;
+}
+
+.meet-staff-role-box.admin{
+  border-color:#ff3333;
+}
+
+.meet-staff-role-box.manager{
+  border-color:#ffd84d;
+}
+
+.meet-staff-role-box.mod{
+  border-color:#31e981;
+}
+
+.meet-staff-role-box.jrmod{
+  border-color:#31e981;
+  box-shadow:0 0 0 3px #00ffff inset;
+}
+
+.meet-staff-role-box.event-manager{
+  border-color:#9f7cff;
+}
+
 .meet-staff-card{
   display:flex;
   flex-direction:column;
   align-items:center;
   gap:12px;
+  width:120px;
 }
 
 .meet-staff-card img{
@@ -291,6 +349,13 @@ nav a:hover{
   font-size:12px;
   color:#7cffb3;
   overflow-wrap:anywhere;
+  line-height:1.5;
+}
+
+.meet-staff-empty{
+  color:#aaa;
+  font-size:11px;
+  line-height:1.8;
 }
 
 /* Tools page styles */
@@ -416,5 +481,9 @@ button:hover{
 
   .tools-title{
     font-size:20px;
+  }
+
+  .page{
+    padding:80px 20px;
   }
 }
