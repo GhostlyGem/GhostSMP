@@ -18,10 +18,20 @@ import {
 const provider = new GoogleAuthProvider();
 
 const authArea = document.getElementById("auth-area");
+let onlineHeartbeat = null;
 
 function minecraftAvatarUrl(mcUsername, size = 32){
   const name = mcUsername && mcUsername.trim() ? mcUsername.trim() : "MHF_Steve";
   return `https://minotar.net/avatar/${encodeURIComponent(name)}/${size}.png`;
+}
+
+async function writeOnlineStatus(user, userData){
+  await setDoc(doc(db,"websiteOnline",user.uid),{
+    name:user.displayName,
+    role:userData.role || "player",
+    mcUsername:userData.mcUsername || "",
+    timestamp:Date.now()
+  });
 }
 
 /* ---------------- Login ---------------- */
@@ -61,6 +71,11 @@ async function logout(logoutBtn){
   const user = auth.currentUser;
 
   if(logoutBtn) logoutBtn.disabled = true;
+
+  if (onlineHeartbeat) {
+    clearInterval(onlineHeartbeat);
+    onlineHeartbeat = null;
+  }
 
   try{
     await signOut(auth);
@@ -153,12 +168,14 @@ onAuthStateChanged(auth, async (user)=>{
 
       /* Track website online users */
 
-      await setDoc(doc(db,"websiteOnline",user.uid),{
-        name:user.displayName,
-        role:userData.role || "player",
-        mcUsername:userData.mcUsername || "",
-        timestamp:Date.now()
-      });
+      await writeOnlineStatus(user, userData);
+
+      if (onlineHeartbeat) clearInterval(onlineHeartbeat);
+      onlineHeartbeat = setInterval(()=>{
+        writeOnlineStatus(user, userData).catch((err)=>{
+          console.warn("Could not refresh online status:", err);
+        });
+      }, 30000);
 
       /* Remove user when tab closes */
 
@@ -175,6 +192,11 @@ onAuthStateChanged(auth, async (user)=>{
     showLoggedInUI(user, userData);
 
   }else{
+
+    if (onlineHeartbeat) {
+      clearInterval(onlineHeartbeat);
+      onlineHeartbeat = null;
+    }
 
     showLoggedOutUI();
 
