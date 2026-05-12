@@ -69,6 +69,39 @@ function uniquePosition(startPosition, rankings, username){
   return position;
 }
 
+function withFixedDuplicatePositions(rankings, batch){
+  const used = new Set();
+
+  return [...rankings]
+    .sort((a, b) => Number(a.position || 9999) - Number(b.position || 9999) || a.id.localeCompare(b.id))
+    .map((ranking) => {
+      let position = Number(ranking.position);
+
+      if (!Number.isInteger(position) || position < 1) {
+        position = 1;
+      }
+
+      while (used.has(position)) {
+        position += 1;
+      }
+
+      used.add(position);
+
+      if (position !== Number(ranking.position)) {
+        batch.update(ranking.ref, {
+          position,
+          updatedAt: serverTimestamp(),
+          updatedBy: currentStaffName
+        });
+      }
+
+      return {
+        ...ranking,
+        position
+      };
+    });
+}
+
 function renderPlayer(docSnap){
   const data = docSnap.data();
   const username = data.username || "Unknown";
@@ -162,11 +195,11 @@ if (form) {
 
     try {
       const rankingsSnap = await getDocs(collection(db, "pvpRankings"));
-      const rankings = rankingsSnap.docs.map(rankingData);
+      const batch = writeBatch(db);
+      const rankings = withFixedDuplicatePositions(rankingsSnap.docs.map(rankingData), batch);
       const startPosition = requestedPosition || nextPosition(rankings);
       const position = uniquePosition(startPosition, rankings, username);
       const playerDoc = doc(db, "pvpRankings", docIdForUsername(username));
-      const batch = writeBatch(db);
       const normalizedUsername = username.toLowerCase();
 
       rankings
