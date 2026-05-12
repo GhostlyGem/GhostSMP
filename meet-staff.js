@@ -8,35 +8,60 @@ import {
 const grid = document.getElementById("meet-staff-grid");
 
 const roleGroups = [
-  { role: "Event Manager", title: "Event Managers", className: "event-manager" },
-  { role: "JrMod", title: "JrMods", className: "jrmod" },
-  { role: "Mod", title: "Mods", className: "mod" },
-  { role: "Manager", title: "Managers", className: "manager" },
-  { role: "Admin", title: "Admins", className: "admin" },
-  { role: "Head Admin", title: "Head Admins", className: "head-admin" },
-  { role: "Owner", title: "Owner", className: "owner" }
+  { role: "Event Manager", title: "Event Managers", className: "event-manager", aliases: ["event manager", "event managers"] },
+  { role: "JrMod", title: "JrMods", className: "jrmod", aliases: ["jrmod", "jrmods", "jr mod", "jr mods", "junior mod", "junior mods"] },
+  { role: "Mod", title: "Mods", className: "mod", aliases: ["mod", "mods", "moderator", "moderators"] },
+  { role: "Manager", title: "Managers", className: "manager", aliases: ["manager", "managers"] },
+  { role: "Admin", title: "Admins", className: "admin", aliases: ["admin", "admins", "administrator", "administrators"] },
+  { role: "Head Admin", title: "Head Admins", className: "head-admin", aliases: ["head admin", "head admins"] },
+  { role: "Owner", title: "Owner", className: "owner", aliases: ["owner", "owners"] }
 ];
 
+function cleanText(value){
+  return String(value || "").trim();
+}
+
 function avatarUrl(username, size = 96){
-  const name = username && username.trim() ? username.trim() : "MHF_Steve";
+  const name = cleanText(username) || "MHF_Steve";
+  return `https://mc-heads.net/avatar/${encodeURIComponent(name)}/${size}`;
+}
+
+function backupAvatarUrl(username, size = 96){
+  const name = cleanText(username) || "MHF_Steve";
   return `https://minotar.net/avatar/${encodeURIComponent(name)}/${size}.png`;
 }
 
 function normalizeRole(role){
-  const cleaned = String(role || "").trim().toLowerCase().replace(/\s+/g, " ");
-  const match = roleGroups.find((group) => group.role.toLowerCase() === cleaned);
+  const cleaned = cleanText(role).toLowerCase().replace(/\s+/g, " ");
+  const match = roleGroups.find((group) => group.aliases.includes(cleaned));
   return match ? match.role : "";
 }
 
-function renderStaffCard(staff){
-  const username = staff.username || "Unknown";
-  const card = document.createElement("div");
-  card.className = "meet-staff-card";
+function staffUsername(staff){
+  return cleanText(staff.username || staff.mcUsername || staff.minecraftUsername || staff.name || staff.displayName || "Unknown");
+}
 
-  card.innerHTML = `
-    <img src="${avatarUrl(username)}" alt="${username} Minecraft head">
-    <div class="meet-staff-name">${username}</div>
-  `;
+function renderStaffCard(staff){
+  const username = staffUsername(staff);
+  const card = document.createElement("div");
+  const image = document.createElement("img");
+  const name = document.createElement("div");
+
+  card.className = "meet-staff-card";
+  image.src = avatarUrl(username);
+  image.alt = `${username} Minecraft head`;
+  image.loading = "lazy";
+  image.addEventListener("error", () => {
+    if (image.dataset.usedBackup === "true") return;
+    image.dataset.usedBackup = "true";
+    image.src = backupAvatarUrl(username);
+  });
+
+  name.className = "meet-staff-name";
+  name.textContent = username;
+
+  card.appendChild(image);
+  card.appendChild(name);
 
   return card;
 }
