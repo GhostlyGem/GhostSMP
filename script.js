@@ -98,6 +98,7 @@ setInterval(loadServerStatus, 30000);
 
 const playersCount = document.getElementById("website-players-count");
 const staffList = document.getElementById("staff-list");
+const ONLINE_TIMEOUT = 90000;
 
 const staffRoles = [
 "Owner",
@@ -112,6 +113,15 @@ const staffRoles = [
 const onlineUsers = new Map();
 const userProfiles = new Map();
 
+function isFreshOnline(data){
+  return Date.now() - Number(data.timestamp || 0) < ONLINE_TIMEOUT;
+}
+
+function currentOnlineUsers(){
+  return Array.from(onlineUsers.entries())
+    .filter(([, data])=> isFreshOnline(data));
+}
+
 function renderOnlineStaff(){
   if(!staffList) return;
 
@@ -119,7 +129,7 @@ function renderOnlineStaff(){
 
   const onlineStaff = [];
 
-  onlineUsers.forEach((onlineData, uid)=>{
+  currentOnlineUsers().forEach(([uid, onlineData])=>{
     const profileData = userProfiles.get(uid) || {};
     const role = onlineData.role || profileData.role || "player";
 
@@ -160,6 +170,12 @@ function renderOnlineStaff(){
   }
 }
 
+function updateOnlineCount(){
+  if(playersCount){
+    playersCount.innerText="Players on Website ("+currentOnlineUsers().length+")";
+  }
+}
+
 const websitePlayersRef = collection(db,"websiteOnline");
 
 onSnapshot(websitePlayersRef,(snapshot)=>{
@@ -169,14 +185,16 @@ onSnapshot(websitePlayersRef,(snapshot)=>{
     onlineUsers.set(docSnap.id, docSnap.data());
   });
 
-  if(playersCount){
-    playersCount.innerText="Players on Website ("+snapshot.size+")";
-  }
-
+  updateOnlineCount();
   renderOnlineStaff();
 }, (err)=>{
 console.error("Website player count failed:", err);
 });
+
+setInterval(()=>{
+  updateOnlineCount();
+  renderOnlineStaff();
+}, 10000);
 
 if(staffList){
   const usersRef = collection(db,"users");
