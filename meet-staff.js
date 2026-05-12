@@ -27,6 +27,10 @@ function cleanText(value){
   return String(value || "").trim();
 }
 
+function roleKey(value){
+  return cleanText(value).toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
 function avatarUrl(username, size = 96){
   const name = cleanText(username) || "MHF_Steve";
   return `https://mc-heads.net/avatar/${encodeURIComponent(name)}/${size}`;
@@ -38,9 +42,15 @@ function backupAvatarUrl(username, size = 96){
 }
 
 function normalizeRole(role){
-  const cleaned = cleanText(role).toLowerCase().replace(/\s+/g, " ");
-  const match = roleGroups.find((group) => group.aliases.includes(cleaned));
+  const key = roleKey(role);
+  const match = roleGroups.find((group) => {
+    return group.aliases.some((alias) => roleKey(alias) === key) || roleKey(group.role) === key;
+  });
   return match ? match.role : "";
+}
+
+function staffRole(staff){
+  return normalizeRole(staff.role || staff.rank || staff.staffRole || staff.staffRank || staff.position || "");
 }
 
 function staffUsername(staff){
@@ -129,7 +139,7 @@ function renderStaff(docs){
     return {
       ...data,
       id: docSnap.id,
-      role: normalizeRole(data.role)
+      role: staffRole(data)
     };
   });
 
