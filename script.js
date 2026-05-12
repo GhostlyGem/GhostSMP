@@ -97,28 +97,7 @@ setInterval(loadServerStatus, 30000);
 /* ---------------- Players On Website ---------------- */
 
 const playersCount = document.getElementById("website-players-count");
-
-if(playersCount){
-
-const websitePlayersRef = collection(db,"websiteOnline");
-
-onSnapshot(websitePlayersRef,(snapshot)=>{
-
-const count = snapshot.size;
-
-playersCount.innerText="Players on Website ("+count+")";
-
-}, (err)=>{
-console.error("Website player count failed:", err);
-});
-
-}
-
-/* ---------------- Staff List ---------------- */
-
 const staffList = document.getElementById("staff-list");
-
-if(staffList){
 
 const staffRoles = [
 "Owner",
@@ -130,42 +109,89 @@ const staffRoles = [
 "Event Manager"
 ];
 
-const usersRef = collection(db,"users");
+const onlineUsers = new Map();
+const userProfiles = new Map();
 
-onSnapshot(usersRef,(snapshot)=>{
+function renderOnlineStaff(){
+  if(!staffList) return;
 
-staffList.innerHTML="";
+  staffList.innerHTML="";
 
-snapshot.forEach((docSnap)=>{
+  const onlineStaff = [];
 
-const data = docSnap.data();
+  onlineUsers.forEach((onlineData, uid)=>{
+    const profileData = userProfiles.get(uid) || {};
+    const role = onlineData.role || profileData.role || "player";
 
-if(!staffRoles.includes(data.role)) return;
+    if(!staffRoles.includes(role)) return;
 
-const div = document.createElement("div");
-div.className="staff-card";
+    onlineStaff.push({
+      uid,
+      name: onlineData.name || profileData.name || "Staff",
+      role,
+      mcUsername: onlineData.mcUsername || profileData.mcUsername || "MHF_Steve",
+      timestamp: onlineData.timestamp || 0
+    });
+  });
 
-const mcName = data.mcUsername && data.mcUsername.length > 0
-  ? data.mcUsername
-  : "MHF_Steve";
+  onlineStaff
+    .sort((a, b)=> staffRoles.indexOf(a.role) - staffRoles.indexOf(b.role) || (b.timestamp || 0) - (a.timestamp || 0))
+    .forEach((staff)=>{
+      const div = document.createElement("div");
+      div.className="staff-card";
 
-div.innerHTML = `
+      div.innerHTML = `
 <img 
-  src="${minecraftAvatarUrl(mcName, 32)}"
-  title="${data.name || "Staff"} (${data.role})"
-  alt="${mcName} Minecraft head"
+  src="${minecraftAvatarUrl(staff.mcUsername, 32)}"
+  title="${staff.name} (${staff.role})"
+  alt="${staff.mcUsername} Minecraft head"
   style="width:32px; height:32px; object-fit:cover; border-radius:4px; cursor:pointer;"
 >
 `;
 
-staffList.appendChild(div);
+      staffList.appendChild(div);
+    });
 
-});
+  if(!onlineStaff.length){
+    const empty = document.createElement("span");
+    empty.className = "rank";
+    empty.textContent = "No staff online";
+    staffList.appendChild(empty);
+  }
+}
 
+const websitePlayersRef = collection(db,"websiteOnline");
+
+onSnapshot(websitePlayersRef,(snapshot)=>{
+  onlineUsers.clear();
+
+  snapshot.forEach((docSnap)=>{
+    onlineUsers.set(docSnap.id, docSnap.data());
+  });
+
+  if(playersCount){
+    playersCount.innerText="Players on Website ("+snapshot.size+")";
+  }
+
+  renderOnlineStaff();
 }, (err)=>{
-console.error("Staff list failed:", err);
+console.error("Website player count failed:", err);
 });
 
+if(staffList){
+  const usersRef = collection(db,"users");
+
+  onSnapshot(usersRef,(snapshot)=>{
+    userProfiles.clear();
+
+    snapshot.forEach((docSnap)=>{
+      userProfiles.set(docSnap.id, docSnap.data());
+    });
+
+    renderOnlineStaff();
+  }, (err)=>{
+  console.error("Staff profile list failed:", err);
+  });
 }
 
 /* ---------------- Watch Application Status ---------------- */
