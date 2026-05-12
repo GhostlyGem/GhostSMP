@@ -302,11 +302,11 @@ nav a:hover{
 }
 
 .meet-staff-role-box.owner{
-  border-color:#00ffff;
+  border-color:#66FFFF;
 }
 
 .meet-staff-role-box.head-admin{
-  border-color:#7a0000;
+  border-color:#800020;
 }
 
 .meet-staff-role-box.admin{
@@ -314,16 +314,16 @@ nav a:hover{
 }
 
 .meet-staff-role-box.manager{
-  border-color:#ffd84d;
+  border-color:#FFEA00;
 }
 
 .meet-staff-role-box.mod{
-  border-color:#31e981;
+  border-color:#9DFF00;
 }
 
 .meet-staff-role-box.jrmod{
-  border-color:#31e981;
-  box-shadow:0 0 0 3px #00ffff inset;
+  border-color:#9DFF00;
+  box-shadow:0 0 0 3px #66FFFF inset;
 }
 
 .meet-staff-role-box.event-manager{
