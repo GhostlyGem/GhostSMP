@@ -87,9 +87,9 @@ cursor:not-allowed;
 
 .staff-form{
 display:grid;
-grid-template-columns:repeat(3,minmax(140px,1fr));
+grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
 gap:12px;
-max-width:720px;
+max-width:900px;
 }
 
 .staff-form input{
@@ -186,6 +186,7 @@ flex-direction:column;
 
 <form id="meet-staff-form" class="staff-form">
 <input id="meet-staff-username" type="text" placeholder="Minecraft username" required>
+<input id="meet-staff-role" type="text" placeholder="Role, ex: Mod or Head Admin" required>
 <input id="meet-staff-position" type="number" min="1" step="1" placeholder="Display order" required>
 <button class="approve" type="submit">Add Staff Member</button>
 </form>
