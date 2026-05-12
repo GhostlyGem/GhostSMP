@@ -69,7 +69,8 @@ color:white;
 
 .deny,
 #staff-logout-btn,
-.remove-pvp-player{
+.remove-pvp-player,
+.remove-meet-staff{
 background:#e74c3c;
 color:white;
 }
@@ -102,20 +103,23 @@ font:inherit;
 justify-self:start;
 }
 
-.pvp-player{
+.pvp-player,
+.meet-staff-player{
 display:flex;
 align-items:center;
 justify-content:space-between;
 gap:12px;
 }
 
-.pvp-player-info{
+.pvp-player-info,
+.meet-staff-player-info{
 display:flex;
 align-items:center;
 gap:10px;
 }
 
-.pvp-player img{
+.pvp-player img,
+.meet-staff-player img{
 width:40px;
 height:40px;
 border-radius:4px;
@@ -136,7 +140,8 @@ flex-direction:column;
 grid-template-columns:1fr;
 }
 
-.pvp-player{
+.pvp-player,
+.meet-staff-player{
 align-items:flex-start;
 flex-direction:column;
 }
@@ -175,6 +180,20 @@ flex-direction:column;
 
 </div>
 
+<div class="section" id="meet-staff-editor-section" style="display:none;">
+
+<h2>Meet the Staff</h2>
+
+<form id="meet-staff-form" class="staff-form">
+<input id="meet-staff-username" type="text" placeholder="Minecraft username" required>
+<input id="meet-staff-position" type="number" min="1" step="1" placeholder="Display order" required>
+<button class="approve" type="submit">Add Staff Member</button>
+</form>
+
+<div id="meet-staff-list"></div>
+
+</div>
+
 <div class="section">
 
 <h2>Staff Activity Log</h2>
@@ -201,6 +220,7 @@ flex-direction:column;
 
 <script type="module" src="staff.js"></script>
 <script type="module" src="staff-pvp.js"></script>
+<script type="module" src="staff-meet.js"></script>
 
 </body>
 </html>
